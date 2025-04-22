@@ -41,7 +41,7 @@ const CustomerForgotPassword = () => {
         if (response.data.message === " No customer found with this email.") {
             return toast.error("No Customer found with this email");
         }
-        toast.info("register your new password");
+        // toast.info("register your new password");
         navigate(`/customer/resetpassword/${email}`);
 
     }

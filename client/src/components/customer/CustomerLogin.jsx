@@ -34,10 +34,16 @@ const CustomerLogin = () => {
             toast.success("logged in successfully!")
             navigate("/customer/home");
         }
-
-        else {
-            toast.error("Invalid email or password");
+        if(message==="Invalid Password."){
+            toast.error("Invalid Password.")
         }
+        if(message==="customer not found with this email."){
+            toast.error("customer not found with this email.")
+        }
+
+        // else {
+        //     toast.error("Invalid email or password");
+        // }
 
         console.log(jwtToken);
         console.log(message);

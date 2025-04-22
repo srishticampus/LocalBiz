@@ -4,13 +4,15 @@ import { Box, Button, Container, InputAdornment, Stack, TextField, Typography, s
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Footer from '../Footer/Footer';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const CustomerResetPassword = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" };
     const siginupStyle = { background: "white", boxShadow: "none" };
 
     const {email}=useParams();
+    const navigate=useNavigate();
     
 
 
@@ -32,13 +34,14 @@ const CustomerResetPassword = () => {
     const validation=()=>{
         let isValid = true;
         let errormessage={};
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,15}$/;
         if(!data.password.trim()){
             errormessage.password="Password is required";
             isValid=false;
         }
-        else if(data.password.length<8||data.password.length>20){
-            errormessage.password="Password must be 8-20 characters long";
-            isValid=false;
+        else if(!passwordRegex.test(data.password)){
+            errormessage.password="Password should have atleast one Uppercase,smallcase,special charecter and should be 6 to 15 char length"
+            isValid = false;
         }
         if(!data.confirmpassword.trim()){
             errormessage.confirmpassword="Confirm Password is required";
@@ -55,10 +58,10 @@ const CustomerResetPassword = () => {
         setError(errormessage);
         return isValid;
     }
-    const [message,setMessage]=useState({
-        success:"",
-        error:""
-    });
+    // const [message,setMessage]=useState({
+    //     success:"",
+    //     error:""
+    // });
     const handleSubmit= async(e)=>{
         e.preventDefault();
         const isValid = validation();
@@ -75,17 +78,20 @@ const CustomerResetPassword = () => {
         
 
         if(result.data.message==="No customer found with this email."){
-            setMessage({
-                success:"",
-                error:"No customer found with this email."
-            });
-            return;
+            // setMessage({
+            //     success:"",
+            //     error:"No customer found with this email."
+            // });
+            // return;
+            toast.error("No customer found with this email.");
         }
         if(result.data.message==="Password reset successfully."){
-            setMessage({
-                success:"Password reset successfully.",
-                error:""
-            });
+            // setMessage({
+            //     success:"Password reset successfully.",
+            //     error:""
+            // });
+            toast.success("Password reset successfully.");
+            navigate("/customer/login");
         }
         
     }
@@ -145,8 +151,8 @@ const CustomerResetPassword = () => {
 
                 </Stack>
                </Box>
-               {message.success && <p style={{ color: 'green', fontSize: '32px',textAlign:"center" }}>{message.success}</p>}
-               {message.error && <p style={{ color: 'red', fontSize: '32px',textAlign:"center" }}>{message.error}</p>}
+               {/* {message.success && <p style={{ color: 'green', fontSize: '32px',textAlign:"center" }}>{message.success}</p>}
+               {message.error && <p style={{ color: 'red', fontSize: '32px',textAlign:"center" }}>{message.error}</p>} */}
 
     </Container>
     <Footer/>

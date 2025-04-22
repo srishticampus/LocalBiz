@@ -32,7 +32,7 @@ const Home = () => {
                 <Typography color='primary' variant='h2' sx={{ fontSize: "52px", fontWeight: "400" }}> Your Gateway to Local Services and</Typography>
                 <Typography color='secondary' variant='h2' sx={{ fontSize: "52px", fontWeight: "400" }}> Business Deals!</Typography>
                 <Box display="flex" justifyContent="center" alignItems="center" gap={5}>
-                    <Link to="/customer/login">
+                    <Link to="/customer/registration">
                         <Button variant="contained"
                             color="secondary"
                             endIcon={<ArrowRightAltIcon />}

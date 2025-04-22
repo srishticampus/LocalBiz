@@ -34,10 +34,16 @@ const BussinessLogin = () => {
             toast.success("logged in successfully!")
             navigate("/bussiness/home");
         }
-
-        else {
-            toast.error("Invalid email or password");
+        if(message==="bussiness not found with this email."){
+            toast.error("Bussiness not found with this email");
         }
+        if(message==="Invalid Password."){
+            toast.error("Invalid Password");
+        }
+
+        // else {
+        //     toast.error("Invalid email or password");
+        // }
 
         console.log(jwtToken);
         console.log(message);

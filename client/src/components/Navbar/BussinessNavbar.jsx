@@ -25,7 +25,7 @@ const pages = [
     { label: 'Contact', path: '/customer/contact' }
 ];
 
-const BussinessNavbar = ({bussinessdetails={},handleOpen={}}) => {
+const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -154,10 +154,10 @@ const BussinessNavbar = ({bussinessdetails={},handleOpen={}}) => {
                             <Box display={"flex"} justifyContent={"center"} alignItems={"center"} sx={{ gap: "30px" }}>
                                 <Typography color='secondary'>Hi,{bussinessdetails?.name} </Typography>
                             
-                                {bussinessdetails?.profilePic?.filename ? (
-                                    <Avatar src={`http://localhost:3000/uploads/${bussinessdetails?.profilePic?.filename}`} alt={bussinessdetails?.name} onClick={handleOpen} />
+                                {bussinessdetails?.profilePic? (
+                                    <Avatar onClick={onAvatarClick} src={`http://localhost:3000/uploads/${bussinessdetails?.profilePic}`} alt={bussinessdetails?.name}  />
                                 ) : (
-                                    <Avatar onClick={handleOpen}>{bussinessdetails?.name?.charAt(0)}</Avatar>
+                                    <Avatar onClick={onAvatarClick}>{bussinessdetails?.name?.charAt(0)}</Avatar>
                                 )}
 
 

@@ -41,7 +41,7 @@ const OrganiserForgotPassword = () => {
         if (response.data.message === " No organisation found with this email.") {
             return toast.error("No organiser found with this email");
         }
-        toast.info("register your new password");
+        // toast.info("register your new password");
         navigate(`/organiser/resetpassword/${email}`);
 
     }

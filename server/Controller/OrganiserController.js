@@ -144,10 +144,11 @@ const editOrganisationById = async (req, res) => {
     try {
         const organisationId = req.params.id;
         const { name, email, phone, address } = req.body;
+        const profilePic = req.file;
 
         const updatedOrganisation = await organisationModel.findByIdAndUpdate(
             organisationId,
-            { name, email, phone, address },
+            { name, email, phone, address,profilePic },
             { new: true }
         );
 

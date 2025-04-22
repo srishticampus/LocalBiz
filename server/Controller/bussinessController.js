@@ -23,6 +23,7 @@ const upload = multer({ storage: storage }).fields([
     { name: "bussinessLogo", maxCount: 1 }
 ]);
 
+
 const bussinessRegister = async (req, res) => {
     try {
         const { name, email, password, confirmpassword, address, phone, bussinessName, bussinessCategory, bussinessDescription, agreed } = req.body;
@@ -154,10 +155,13 @@ const editBussinessById = async (req, res) => {
     try {
         const bussinessId = req.params.id;
         const { name, email, phone, address } = req.body;
+        // const profilePic=req.file;
+        const profilePic = req.files?.profilePic?.[0]?.filename || null;
 
-        const updatedBussiness = await customerModel.findByIdAndUpdate(
+
+        const updatedBussiness = await bussinessModel.findByIdAndUpdate(
             bussinessId,
-            { name, email, phone, address },
+            { name, email, phone, address ,...(profilePic && { profilePic })},
             { new: true }
         );
 

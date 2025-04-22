@@ -5,7 +5,8 @@ import profileFrame from "../../assets/image 42.png";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Footer from '../Footer/Footer';
 import axios from "axios";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const OrganiserRegister = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
@@ -63,22 +64,23 @@ const OrganiserRegister = () => {
       let isValid = true;
       let errorMessage = {};
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,15}$/;
       if (!data.name.trim()) {
-          errorMessage.name="name should not be empty"
+          errorMessage.name="Name should not be empty"
           isValid = false;
       }
       
       else if(data.name.length<3||data.name.length>20){
-          errorMessage.name="name should be 3 to 20 char length"
+          errorMessage.name="Name should be 3 to 20 char length"
           isValid = false;
 
       }
       if (!data.organizationName.trim()) {
-        errorMessage.organizationName="organiser name should not be empty"
+        errorMessage.organizationName="Organiser name should not be empty"
         isValid = false;
     }
     if (!data.organizationType.trim()) {
-        errorMessage.organizationType="organiser type should not be empty"
+        errorMessage.organizationType="Organiser type should not be empty"
         isValid = false;
     }
       if (!data.email.trim()) {
@@ -93,36 +95,36 @@ const OrganiserRegister = () => {
           errorMessage.password = "Password should not be empty";
           isValid = false;
       }
-      else if(data.password.length<8||data.password.length>20){
-          errorMessage.password="password should be 8 to 20 char length"
-          isValid = false;
-      }
+      else if(!passwordRegex.test(data.password)){
+        errorMessage.password="Password should have atleast one Uppercase,smallcase,special charecter and should be 6 to 15 char length"
+        isValid = false;
+    }
       if (!data.confirmpassword.trim()) {
           errorMessage.confirmPassword = "Confirm Password should not be empty";
           isValid = false;
       }
       else if(data.confirmpassword.length<8||data.confirmpassword.length>20){
-          errorMessage.confirmPassword="confirm password should be 8 to 20 char length"
+          errorMessage.confirmPassword="Confirm password should be 8 to 20 char length"
           isValid = false;
       }
       if (data.password !== data.confirmpassword) {
-          errorMessage.confirmPassword = "password and confirm password should be same";
+          errorMessage.confirmPassword = "Password and confirm password should be same";
           isValid = false;
       }
       if(data.address.length<10){
-          errorMessage.address="address should be 10 char length"
+          errorMessage.address="Address should be 10 char length"
           isValid = false;
       }
       else if(!data.address.trim()){
-          errorMessage.address="address should not be empty"
+          errorMessage.address="Address should not be empty"
           isValid = false;
       }
       if(!data.phone.trim()){
-          errorMessage.phone="phone should not be empty"
+          errorMessage.phone="Phone should not be empty"
           isValid = false;
       }
       else if(data.phone.length !==10){
-          errorMessage.phone="phone should be 10 digit"
+          errorMessage.phone="Phone should be 10 digit"
           isValid = false;
       }
       if(!checked){
@@ -134,7 +136,7 @@ const OrganiserRegister = () => {
 
   }
 
-
+const navigate=useNavigate();
   const handleSubmit = async (e) => {
       const isValid = validation();
       if (!isValid) {
@@ -165,18 +167,21 @@ const OrganiserRegister = () => {
 
 
       if (result.message === "Organization already registered with this phone number") {
-          return setMessage({
-              success: "",
-              error: "you have already registered with this phone number"
+        //   return setMessage({
+        //       success: "",
+        //       error: "you have already registered with this phone number"
 
-          })
+        //   })
+            toast.error("you have already registered with this phone number")
+            
       }
       if (result.message === "Organization already registered with this email") {
-          return setMessage({
-              success: "",
-              error: "you have already registered with this email id"
+        //   return setMessage({
+        //       success: "",
+        //       error: "you have already registered with this email id"
 
-          })
+        //   })
+            toast.error("you have already registered with this email id")
       }
       if (result.message === "Organization created successfully") {
           setData({
@@ -193,7 +198,9 @@ const OrganiserRegister = () => {
           setChecked(false);
           setImagePreview(null);
 
-          return setMessage({ success: "organiser Profile created", error: "" });
+        //   return setMessage({ success: "organiser Profile created", error: "" });
+            toast.success("Organiser Profile created");
+            navigate("/organiser/login")
       }
 
 
@@ -367,8 +374,8 @@ const OrganiserRegister = () => {
 
                     </Box>
                 </Box>
-                {message.success && <p style={{ textAlign: "center", color: "green", fontSize: "32px", fontWeight: "600" }}>{message.success}</p>}
-                {message.error && <p style={{ textAlign: "center", color: "red", fontSize: "32px", fontWeight: "600" }}>{message.error}</p>}
+                {/* {message.success && <p style={{ textAlign: "center", color: "green", fontSize: "32px", fontWeight: "600" }}>{message.success}</p>}
+                {message.error && <p style={{ textAlign: "center", color: "red", fontSize: "32px", fontWeight: "600" }}>{message.error}</p>} */}
 
             </Container>
             <Footer />

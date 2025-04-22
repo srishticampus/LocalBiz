@@ -21,11 +21,11 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const pages = [
     { label: 'Home', path: '/customer/home' },
-    { label: 'About', path: '/customer/about' },
-    { label: 'Contact', path: '/customer/contact' }
+    { label: 'About', path: '#' },
+    { label: 'Contact', path: '#' }
 ];
 
-const CustomerNavbar = ({customerdetails={},handleOpen={}}) => {
+const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -155,9 +155,9 @@ const CustomerNavbar = ({customerdetails={},handleOpen={}}) => {
                                 <Typography color='secondary'>Hi,{customerdetails?.name} </Typography>
                             
                                 {customerdetails?.profilePic?.filename ? (
-                                    <Avatar src={`http://localhost:3000/uploads/${customerdetails?.profilePic?.filename}`} alt={customerdetails?.name} onClick={handleOpen} />
+                                    <Avatar onClick={onAvatarClick} src={`http://localhost:3000/uploads/${customerdetails?.profilePic?.filename}`} alt={customerdetails?.name} />
                                 ) : (
-                                    <Avatar onClick={handleOpen} >{customerdetails?.name?.charAt(0)}</Avatar>
+                                    <Avatar onClick={onAvatarClick} >{customerdetails?.name?.charAt(0)}</Avatar>
                                 )}
 
 

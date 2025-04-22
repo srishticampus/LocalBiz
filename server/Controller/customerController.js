@@ -141,11 +141,12 @@ const getCustomerById=async(req,res)=>{
 const editCustomerById = async (req, res) => {
     try {
         const customerId = req.params.id;
+        const profilePic = req.file;
         const { name, email, phone, address } = req.body;
 
         const updatedCustomer = await customerModel.findByIdAndUpdate(
             customerId,
-            { name, email, phone, address },
+            { name, email, phone, address,profilePic },
             { new: true }
         );
 

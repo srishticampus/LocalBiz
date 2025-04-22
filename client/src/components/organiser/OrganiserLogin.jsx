@@ -34,10 +34,16 @@ const OrganiserLogin = () => {
             toast.success("logged in successfully!")
             navigate("/organiser/home");
         }
-
-        else {
-            toast.error("Invalid email or password");
+        if(message==="Invalid Password."){
+            toast.error("Invalid password");
         }
+        if(message==="organisation not found with this email."){
+            toast.error("Organisation not found with this email");
+        }
+
+        // else {
+        //     toast.error("Invalid email or password");
+        // }
 
         console.log(jwtToken);
         console.log(message);

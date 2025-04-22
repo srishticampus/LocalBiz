@@ -25,7 +25,7 @@ const pages = [
     { label: 'Contact', path: '/customer/contact' }
 ];
 
-const OrganiserNavbar = ({organiserdetails={},handleOpen={}}) => {
+const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -155,9 +155,9 @@ const OrganiserNavbar = ({organiserdetails={},handleOpen={}}) => {
                                 <Typography color='secondary'>Hi,{organiserdetails?.name} </Typography>
                             
                                 {organiserdetails?.profilePic?.filename ? (
-                                    <Avatar src={`http://localhost:3000/uploads/${organiserdetails?.profilePic?.filename}`} alt={organiserdetails?.name} onClick={handleOpen} />
+                                    <Avatar onClick={onAvatarClick} src={`http://localhost:3000/uploads/${organiserdetails?.profilePic?.filename}`} alt={organiserdetails?.name} />
                                 ) : (
-                                    <Avatar onClick={handleOpen}>{organiserdetails?.name?.charAt(0)}</Avatar>
+                                    <Avatar onClick={onAvatarClick} >{organiserdetails?.name?.charAt(0)}</Avatar>
                                 )}
 
 

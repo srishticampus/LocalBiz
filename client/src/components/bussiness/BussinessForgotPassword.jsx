@@ -41,7 +41,7 @@ const BussinessForgotPassword = () => {
         if (response.data.message === " No bussiness found with this email.") {
             return toast.error("No bussiness found with this email");
         }
-        toast.info("register your new password");
+        // toast.info("register your new password");
         navigate(`/bussiness/resetpassword/${email}`);
 
     }

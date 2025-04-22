@@ -24,6 +24,10 @@ import About from './components/landing/About';
 import CustomerHome from './components/customer/CustomerHome';
 import BussinessHome from './components/bussiness/BussinessHome';
 import OrganiserHome from './components/organiser/OrganiserHome';
+import CustomerProductView from './components/customer/CustomerProductView';
+import BussinessAddProduct from './components/bussiness/BussinessAddProduct';
+import BussinessEditProducts from './components/bussiness/BussinessEditProducts';
+import CustomerProfile from './components/customer/CustomerProfile';
 
 
 function App() {
@@ -61,6 +65,9 @@ function App() {
      <Route path='/customer/forgotpassword' element={<CustomerForgotPassword/>}/>
      <Route path='/customer/resetpassword/:email' element={<CustomerResetPassword/>}/>
      <Route path='/customer/home' element={<CustomerHome/>}/>
+     <Route path='/customer/viewproduct' element={<CustomerProductView/>}/>
+     <Route path='/customer/profile' element={<CustomerProfile/>}/>
+
 
      {/* bussiness */}
      <Route path='/bussiness/registration' element={<BussinessRegister/>}/>
@@ -68,6 +75,8 @@ function App() {
      <Route path='/bussiness/forgotpassword' element={<BussinessForgotPassword/>}/>
      <Route path='/bussiness/resetpassword/:email' element={<BussinessResetPassword/>}/>
      <Route path='/bussiness/home' element={<BussinessHome/>}/>
+     <Route path='/bussiness/addproduct' element={<BussinessAddProduct/>}/>
+     <Route path='/bussiness/editproduct/:id' element={<BussinessEditProducts/>}/>
 
      {/* organiser */}
      <Route path='/organiser/registration' element={<OrganiserRegister/>}/>
