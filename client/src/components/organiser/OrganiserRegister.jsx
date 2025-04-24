@@ -16,14 +16,20 @@ const OrganiserRegister = () => {
 
   const handleChange = (event) => {
       setChecked(event.target.checked);
+      if (event.target.checked) {
+        setError((prevError) => ({
+            ...prevError,
+            terms: ""
+        }));
+    }
   };
 
   const [imagePreview, setImagePreview] = useState(null);
 
-  const [message, setMessage] = useState({
-      success: "",
-      error: ""
-  })
+//   const [message, setMessage] = useState({
+//       success: "",
+//       error: ""
+//   })
   const [error, setError] = useState({})
 
   const [data, setData] = useState({
@@ -138,11 +144,12 @@ const OrganiserRegister = () => {
 
 const navigate=useNavigate();
   const handleSubmit = async (e) => {
+    e.preventDefault();
       const isValid = validation();
       if (!isValid) {
           return;
       }
-      e.preventDefault();
+      
       // console.log(data)
       const formData = new FormData();
       formData.append('name', data.name);

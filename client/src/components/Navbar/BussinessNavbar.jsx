@@ -20,9 +20,9 @@ import { InputAdornment, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 const pages = [
-    { label: 'Home', path: '/customer/home' },
-    { label: 'About', path: '/customer/about' },
-    { label: 'Contact', path: '/customer/contact' }
+    { label: 'Home', path: '/bussiness/home' },
+    { label: 'About', path: '#' },
+    { label: 'Contact', path: '#' }
 ];
 
 const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {

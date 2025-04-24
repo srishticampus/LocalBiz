@@ -17,6 +17,12 @@ const BussinessRegister = () => {
 
   const handleChange = (event) => {
       setChecked(event.target.checked);
+      if (event.target.checked) {
+        setError((prevError) => ({
+            ...prevError,
+            terms: ""
+        }));
+    }
   };
 
   const [imagePreview, setImagePreview] = useState(null);
