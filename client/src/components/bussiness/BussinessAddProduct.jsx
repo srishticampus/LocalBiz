@@ -6,6 +6,7 @@ import axios from "axios";
 import { Link } from 'react-router-dom';
 import uploadphoto from "../../assets/upphoto.png";
 import { toast } from 'react-toastify';
+import { baseUrl } from '../../baseUrl';
 
 const BussinessAddProduct = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
@@ -142,7 +143,7 @@ const BussinessAddProduct = () => {
         const token=localStorage.getItem("token")
 
 
-        const response = await axios.post("http://localhost:3000/localbiz/bussiness/addproduct", formData, {
+        const response = await axios.post(`${baseUrl}bussiness/addproduct`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data"

@@ -23,7 +23,7 @@ const BussinessLogin = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await axios.post("http://localhost:3000/localbiz/bussiness/login", data);
+        const response = await axios.post(`${baseUrl}bussiness/login`, data);
 
         const jwtToken = response.data.token;
         const message = response.data.message;

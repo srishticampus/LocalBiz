@@ -35,7 +35,7 @@ const CustomerForgotPassword = () => {
             return;
         }
 
-        const response = await axios.post("http://localhost:3000/localbiz/customer/forgotpassword", { email });
+        const response = await axios.post(`${baseUrl}customer/forgotpassword`, { email });
         console.log(response.data);
         setEmail("");
         if (response.data.message === " No customer found with this email.") {

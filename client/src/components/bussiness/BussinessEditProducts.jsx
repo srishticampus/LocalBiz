@@ -143,7 +143,7 @@ const BussinessEditProducts = () => {
         const token=localStorage.getItem("token")
 
 
-        const response = await axios.post(`http://localhost:3000/localbiz/bussiness/editproduct/${id}`, formData, {
+        const response = await axios.post(`${baseUrl}bussiness/editproduct/${id}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data"

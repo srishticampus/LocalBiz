@@ -35,7 +35,7 @@ const OrganiserForgotPassword = () => {
             return;
         }
 
-        const response = await axios.post("http://localhost:3000/localbiz/organisation/forgotpassword", { email });
+        const response = await axios.post(`${baseUrl}organisation/forgotpassword`, { email });
         console.log(response.data);
         setEmail("");
         if (response.data.message === " No organisation found with this email.") {
