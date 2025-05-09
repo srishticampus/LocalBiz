@@ -6,7 +6,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Footer from '../Footer/Footer';
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
-import bussinesslogo from "../../assets/frame 16.png";
+import bussinesslogo from "../../assets/Frame 16.png";
 import { toast } from 'react-toastify';
 
 const BussinessRegister = () => {
