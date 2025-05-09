@@ -33,7 +33,7 @@ const OrganiserHome = () => {
     const fetchUser=async()=>{
         const token = localStorage.getItem('token');
         const decoded = jwtDecode(token);
-        const organiser=await axios.get(`http://localhost:3000/localbiz/organisation/getorganisation/${decoded.id}`,{
+        const organiser=await axios.get(`${baseUrl}organisation/getorganisation/${decoded.id}`,{
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -178,7 +178,7 @@ const OrganiserHome = () => {
 
         console.log(data);
         const token = localStorage.getItem("token");
-        const updated = await axios.post(`http://localhost:3000/localbiz/organisation/editorganisation/${organiser._id}`, formData, {
+        const updated = await axios.post(`${baseUrl}organisation/editorganisation/${organiser._id}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

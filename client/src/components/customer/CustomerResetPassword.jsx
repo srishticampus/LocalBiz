@@ -68,7 +68,7 @@ const CustomerResetPassword = () => {
         if (!isValid) {
             return;
         }
-        const result= await axios.post(`http://localhost:3000/localbiz/customer/resetpassword/${email}`,data);
+        const result= await axios.post(`${baseUrl}customer/resetpassword/${email}`,data);
 
         console.log(result);
 

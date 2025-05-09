@@ -35,7 +35,7 @@ const BussinessForgotPassword = () => {
             return;
         }
 
-        const response = await axios.post("http://localhost:3000/localbiz/bussiness/forgotpassword", { email });
+        const response = await axios.post(`${baseUrl}bussiness/forgotpassword`, { email });
         console.log(response.data);
         setEmail("");
         if (response.data.message === " No bussiness found with this email.") {

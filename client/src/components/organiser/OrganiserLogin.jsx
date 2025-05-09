@@ -23,7 +23,7 @@ const OrganiserLogin = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await axios.post("http://localhost:3000/localbiz/organisation/login", data);
+        const response = await axios.post(`${baseUrl}organisation/login`, data);
 
         const jwtToken = response.data.token;
         const message = response.data.message;

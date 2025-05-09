@@ -149,7 +149,7 @@ const navigate=useNavigate();
       formData.append('profilePic', data.profilePic);
       formData.append('agreed', checked)
 
-      const response = await axios.post("http://localhost:3000/localbiz/customer/registration", formData);
+      const response = await axios.post(`${baseUrl}customer/registration`, formData);
 
       const result = response.data;
       console.log(result);

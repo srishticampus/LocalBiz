@@ -32,7 +32,7 @@ const BussinessHome = () => {
     const fetchUser = async () => {
         const token = localStorage.getItem('token');
         const decoded = jwtDecode(token);
-        const bussiness = await axios.get(`http://localhost:3000/localbiz/bussiness/getbussiness/${decoded.id}`, {
+        const bussiness = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -48,7 +48,7 @@ const BussinessHome = () => {
     const [product,setProduct]=useState([]);
     const fetchProductDetails=async()=>{
         const token = localStorage.getItem("token");
-    const response = await axios.get(`http://localhost:3000/localbiz/bussiness/viewproduct`, {
+    const response = await axios.get(`${baseUrl}bussiness/viewproduct`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -195,7 +195,7 @@ const BussinessHome = () => {
 
         console.log(data);
         const token = localStorage.getItem("token");
-        const updated = await axios.post(`http://localhost:3000/localbiz/bussiness/editBussiness/${bussiness._id}`, formData, {
+        const updated = await axios.post(`${baseUrl}bussiness/editBussiness/${bussiness._id}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

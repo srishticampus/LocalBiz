@@ -9,7 +9,7 @@ const cors=require("cors")
 
 app.use(cors());
 app.use(express.json());
-app.use("/localbiz", router);
+app.use("/local_biz_api", router);
 app.use('/uploads', express.static('uploads'));
 
 

@@ -68,7 +68,7 @@ const OrganiserResetPassword = () => {
         if (!isValid) {
             return;
         }
-        const result= await axios.post(`http://localhost:3000/localbiz/organisation/resetpassword/${email}`,data);
+        const result= await axios.post(`${baseUrl}organisation/resetpassword/${email}`,data);
 
         console.log(result);
 

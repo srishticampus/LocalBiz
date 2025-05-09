@@ -33,7 +33,7 @@ const CustomerHome = () => {
     const fetchUser = async () => {
         const token = localStorage.getItem('token');
         const decoded = jwtDecode(token);
-        const customer = await axios.get(`http://localhost:3000/localbiz/customer/getcustomer/${decoded.id}`, {
+        const customer = await axios.get(`${baseUrl}customer/getcustomer/${decoded.id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -178,7 +178,7 @@ const CustomerHome = () => {
 
         console.log(data);
         const token = localStorage.getItem("token");
-        const updated = await axios.post(`http://localhost:3000/localbiz/customer/editcustomer/${customer._id}`, formData, {
+        const updated = await axios.post(`${baseUrl}customer/editcustomer/${customer._id}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
