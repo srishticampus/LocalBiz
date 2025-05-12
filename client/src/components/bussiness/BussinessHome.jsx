@@ -14,6 +14,7 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import { baseUrl } from '../../baseUrl';
 
 const BussinessHome = () => {
     const styleLogout = {

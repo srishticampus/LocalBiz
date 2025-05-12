@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Backdrop from '@mui/material/Backdrop';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import { baseUrl } from '../../baseUrl';
 
 const CustomerProfile = () => {
     

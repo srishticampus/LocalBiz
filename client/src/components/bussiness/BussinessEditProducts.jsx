@@ -6,6 +6,7 @@ import axios from "axios";
 import { Link, useParams } from 'react-router-dom';
 import uploadphoto from "../../assets/upphoto.png";
 import { toast } from 'react-toastify';
+import { baseUrl } from '../../baseUrl';
 
 const BussinessEditProducts = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
