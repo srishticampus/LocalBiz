@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Backdrop from '@mui/material/Backdrop';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import { baseUrl } from '../../baseUrl';
 
 const CustomerProfile = () => {
     
@@ -71,7 +72,7 @@ const CustomerProfile = () => {
 
         console.log(data);
         const token = localStorage.getItem("token");
-        const updated = await axios.post(`http://localhost:3000/localbiz/customer/editcustomer/${customerDetails._id}`, data, {
+        const updated = await axios.post(`${baseUrl}customer/editcustomer/${customerDetails._id}`, data, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -90,7 +91,7 @@ const CustomerProfile = () => {
 
             const token = localStorage.getItem("token");
     const parentDetails = JSON.parse(localStorage.getItem("parentdetails"));
-    const res = await axios.get(`http://localhost:4000/ldss/parent/getparent/${parentDetails._id}`, {
+    const res = await axios.get(`${baseUrl}ldss/parent/getparent/${parentDetails._id}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -124,7 +125,7 @@ const CustomerProfile = () => {
             profilePic: null, // leave this null so user can choose a new one
         });
         setImagePreview(parentDetails?.profilePic?.filename 
-            ? `http://localhost:4000/uploads/${parentDetails.profilePic.filename}` 
+            ? `${baseUrl}uploads/${parentDetails.profilePic.filename}` 
             : null);
         setEditOpen(true);
     }

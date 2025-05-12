@@ -5,6 +5,7 @@ import Footer from '../Footer/Footer';
 import axios from "axios";
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { baseUrl } from '../../baseUrl';
 
 const OrganiserForgotPassword = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" };
@@ -35,7 +36,7 @@ const OrganiserForgotPassword = () => {
             return;
         }
 
-        const response = await axios.post("http://localhost:3000/localbiz/organisation/forgotpassword", { email });
+        const response = await axios.post(`${baseUrl}organisation/forgotpassword`, { email });
         console.log(response.data);
         setEmail("");
         if (response.data.message === " No organisation found with this email.") {

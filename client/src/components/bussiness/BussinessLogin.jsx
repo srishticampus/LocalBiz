@@ -6,6 +6,7 @@ import Footer from '../Footer/Footer';
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { baseUrl } from '../../baseUrl';
 
 const BussinessLogin = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
@@ -23,7 +24,7 @@ const BussinessLogin = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await axios.post("http://localhost:3000/localbiz/bussiness/login", data);
+        const response = await axios.post(`${baseUrl}bussiness/login`, data);
 
         const jwtToken = response.data.token;
         const message = response.data.message;

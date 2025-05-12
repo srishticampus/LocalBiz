@@ -6,8 +6,9 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Footer from '../Footer/Footer';
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
-import bussinesslogo from "../../assets/frame 16.png";
+import bussinesslogo from "../../assets/Frame 16.png";
 import { toast } from 'react-toastify';
+import { baseUrl } from '../../baseUrl';
 
 const BussinessRegister = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
@@ -179,7 +180,7 @@ const navigate=useNavigate();
       formData.append('profilePic', data.profilePic);
       formData.append('agreed', checked)
 
-      const response = await axios.post("http://localhost:3000/localbiz/bussiness/registration", formData);
+      const response = await axios.post(`${baseUrl}bussiness/registration`, formData);
 
       const result = response.data;
       console.log(result);
