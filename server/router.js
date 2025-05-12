@@ -13,6 +13,10 @@ const adminController=require("./Controller/adminController");
 
 const bussinessProductController=require("./Controller/bussinessProductController");
 
+//Default Route
+router.get("/",(req,res)=>{
+    res.send("Welcome to Local Biz API");
+})
 // admin
 router.post("/admin/login",adminController.adminLogin)
 
