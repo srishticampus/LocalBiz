@@ -8,6 +8,7 @@ import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
 import bussinesslogo from "../../assets/Frame 16.png";
 import { toast } from 'react-toastify';
+import { baseUrl } from '../../baseUrl';
 
 const BussinessRegister = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }

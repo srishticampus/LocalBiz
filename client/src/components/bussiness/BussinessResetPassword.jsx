@@ -6,6 +6,7 @@ import Footer from '../Footer/Footer';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { baseUrl } from '../../baseUrl';
 
 const BussinessResetPassword = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" };

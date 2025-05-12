@@ -5,6 +5,7 @@ import Footer from '../Footer/Footer';
 import axios from "axios";
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { baseUrl } from '../../baseUrl';
 
 const CustomerForgotPassword = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" };
