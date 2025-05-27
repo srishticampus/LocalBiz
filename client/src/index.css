@@ -2,3 +2,7 @@
     margin: 0;
     font-family: 'Roboto', sans-serif;
 }
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
