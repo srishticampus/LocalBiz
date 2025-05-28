@@ -45,6 +45,12 @@ const organiserSchema = mongoose.Schema(
             type: Boolean,
             require: true
         },
+        isVerified: {
+            type: Boolean,
+            default: false
+        },
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
         isActive: {
             type: Boolean,
             default: true
@@ -52,7 +58,11 @@ const organiserSchema = mongoose.Schema(
         isAdminApproved: {
             type: Boolean,
             default: false
-        }
+        },
+        members: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "bussiness"
+        }]
     }, { timeStamps: true }
 )
 

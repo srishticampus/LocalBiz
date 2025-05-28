@@ -9,7 +9,7 @@ This document outlines all backend features required for the LocalBiz Connect pl
 ### Features:
 - **Role-based access** (Consumer, Business Owner, Community Organization, Admin) - **Implemented via separate user models**.
 - **JWT-based authentication** - **Partially Implemented** (Protected routes exist, but JWT fields are not explicitly stored in models).
-- **Password reset** via email - **Partially Implemented** (Routes exist, email sending is To Be Implemented).
+- **Password reset** via email - **Implemented**.
 
 ### Implementation Steps:
 1. **Models**:
@@ -18,17 +18,17 @@ This document outlines all backend features required for the LocalBiz Connect pl
      {
        email: { type: String, unique: true },
        password: String,
-       role: { type: String, enum: ["consumer", "business", "community", "admin"] }, // To Be Implemented (role is implicit in separate models)
-       isVerified: { type: Boolean, default: false }, // To Be Implemented
-       resetPasswordToken: String, // To Be Implemented
-       resetPasswordExpires: Date // To Be Implemented
+       role: { type: String, enum: ["consumer", "business", "community", "admin"] }, // Implemented (role is implicit in separate models)
+       isVerified: { type: Boolean, default: false }, // Implemented
+       resetPasswordToken: String, // Implemented
+       resetPasswordExpires: Date // Implemented
      }
      ```
    - **Implemented Models**:
      - `adminModel.js`: `email`, `password`
-     - `customerModel.js`: `name`, `email`, `password`, `confirmpassword`, `dateOfBirth`, `phone`, `profilePic`, `address`, `agreed`, `isActive`, `isAdminApproved`
-     - `bussinessModel.js`: `name`, `email`, `password`, `confirmpassword`, `dateOfBirth`, `phone`, `profilePic`, `address`, `agreed`, `isActive`, `isAdminApproved`, `bussinessName`, `bussinessCategory`, `bussinessDescription`, `bussinessLogo`
-     - `organiserModel.js`: `organizationName`, `organizationType`, `name`, `email`, `password`, `confirmpassword`, `dateOfBirth`, `phone`, `profilePic`, `address`, `agreed`, `isActive`, `isAdminApproved`
+     - `customerModel.js`: `name`, `email`, `password`, `confirmpassword`, `dateOfBirth`, `phone`, `profilePic`, `address`, `agreed`, `isActive`, `isAdminApproved`, `isVerified`, `resetPasswordToken`, `resetPasswordExpires`
+     - `bussinessModel.js`: `name`, `email`, `password`, `confirmpassword`, `dateOfBirth`, `phone`, `profilePic`, `address`, `agreed`, `isActive`, `isAdminApproved`, `bussinessName`, `bussinessCategory`, `bussinessDescription`, `bussinessLogo`, `isVerified`, `resetPasswordToken`, `resetPasswordExpires`
+     - `organiserModel.js`: `organizationName`, `organizationType`, `name`, `email`, `password`, `confirmpassword`, `dateOfBirth`, `phone`, `profilePic`, `address`, `agreed`, `isActive`, `isAdminApproved`, `isVerified`, `resetPasswordToken`, `resetPasswordExpires`
 
 2. **Routes**:
    - `POST /admin/login` - **Implemented**.
@@ -54,16 +54,16 @@ This document outlines all backend features required for the LocalBiz Connect pl
 3. **Controllers**:
    - Validate registration fields (e.g., email uniqueness, password strength) - **Partially Implemented** (Basic validation in controllers).
    - Hash passwords using `bcrypt` - **Implemented**.
-   - Send verification/password reset emails via Nodemailer - **To Be Implemented**.
+   - Send verification/password reset emails via Nodemailer - **Implemented**.
 
 ---
 
 ## 2. **Consumer Module**
 ### Features:
 - Registration/Profile Management - **Implemented**.
-- Business/Product Search - **To Be Implemented**.
-- Reviews & Complaints - **To Be Implemented**.
-- Chats - **To Be Implemented**.
+- Business/Product Search - **Implemented**.
+- Reviews & Complaints - **Implemented**.
+- Chats - **Implemented**.
 
 ### Implementation Steps:
 1. **Models**:
@@ -83,7 +83,7 @@ This document outlines all backend features required for the LocalBiz Connect pl
        isAdminApproved: { type: Boolean, default: false }
      }
      ```
-   - `Review`: **To Be Implemented**.
+   - `Review`: **Implemented**.
      ```javascript
      {
        consumer: { type: Schema.Types.ObjectId, ref: "Consumer" },
@@ -92,7 +92,7 @@ This document outlines all backend features required for the LocalBiz Connect pl
        comment: String,
      }
      ```
-   - `Complaint`: **To Be Implemented**.
+   - `Complaint`: **Implemented**.
      ```javascript
      {
        consumer: { type: Schema.Types.ObjectId, ref: "Consumer" },
@@ -104,13 +104,13 @@ This document outlines all backend features required for the LocalBiz Connect pl
 2. **Routes**:
    - `GET /customer/getcustomer/:id` (view profile, protected) - **Implemented**.
    - `POST /customer/editcustomer/:id` (edit profile, protected, with profile pic upload) - **Implemented**.
-   - `GET /api/businesses` (search with filters: category, location) - **To Be Implemented**.
-   - `POST /api/reviews` (create/update reviews) - **To Be Implemented**.
-   - `POST /api/complaints` (submit/view complaints) - **To Be Implemented**.
+   - `GET /api/businesses` (search with filters: category, location) - **Implemented**.
+   - `POST /api/reviews` (create/update reviews) - **Implemented**.
+   - `POST /api/complaints` (submit/view complaints) - **Implemented**.
 
 3. **Controllers**:
-   - Integrate geospatial search for businesses using MongoDB’s `2dsphere` index - **To Be Implemented**.
-   - Validate review ratings (1-5 stars) - **To Be Implemented**.
+   - Integrate geospatial search for businesses using MongoDB’s `2dsphere` index - **Partially Implemented**.
+   - Validate review ratings (1-5 stars) - **Implemented**.
 
 ---
 
@@ -140,9 +140,8 @@ This document outlines all backend features required for the LocalBiz Connect pl
        bussinessName: { type: String, require: true },
        bussinessCategory: { type: String, require: true },
        bussinessDescription: { type: String, require: true },
-       bussinessLogo: { type: Object, require: true } // Stores uploaded file info
-       // owner: { type: Schema.Types.ObjectId, ref: "User" }, // Not implemented, authentication handled within this model
-       // location: { type: { type: String }, coordinates: [Number] }, // GeoJSON - To Be Implemented
+       bussinessLogo: { type: Object, require: true }, // Stores uploaded file info
+       location: { type: { type: String }, coordinates: [Number] }, // GeoJSON - Implemented
      }
      ```
    - `Product` (Implemented as `bussinessProductModel.js`):
@@ -167,18 +166,18 @@ This document outlines all backend features required for the LocalBiz Connect pl
    - `POST /bussiness/addproduct` (add product, protected, with product pic upload) - **Implemented**.
    - `POST /bussiness/editproduct/:id` (edit product, protected, with product pic upload) - **Implemented**.
    - `GET /bussiness/viewproduct` (view products, protected, currently includes product pic upload middleware - *review if upload is necessary on view*) - **Implemented**.
-   - `GET /api/business/analytics` (sales/views data) - **To Be Implemented**.
-   - `POST /api/business/join-community` (request to join a community) - **To Be Implemented**.
+   - `GET /api/business/analytics` (sales/views data) - **Implemented**.
+   - `POST /api/business/join-community` (request to join a community) - **Implemented**.
 
 3. **Controllers**:
    - Track product views using middleware - **To Be Implemented**.
-   - Use aggregation pipelines for analytics (e.g., total revenue) - **To Be Implemented**.
+   - Use aggregation pipelines for analytics (e.g., total revenue) - **Implemented**.
 
 ---
 
 ## 4. **Community Organization Module**
 ### Features:
-- Event/Training/Workshop Management - **To Be Implemented**.
+- Event/Training/Workshop Management - **Implemented**.
 - Business Approval Workflow - **Partially Implemented** (Admin approval status in model).
 
 ### Implementation Steps:
@@ -198,12 +197,11 @@ This document outlines all backend features required for the LocalBiz Connect pl
        address: { type: String, require: true },
        agreed: { type: Boolean, require: true },
        isActive: { type: Boolean, default: true },
-       isAdminApproved: { type: Boolean, default: false } // Admin approval status
-       // admin: { type: Schema.Types.ObjectId, ref: "User" }, // Not implemented, authentication handled within this model
-       // members: [{ type: Schema.Types.ObjectId, ref: "Business" }], // To Be Implemented
+       isAdminApproved: { type: Boolean, default: false }, // Admin approval status
+       members: [{ type: Schema.Types.ObjectId, ref: "Business" }], // Implemented
      }
      ```
-   - `Event`: **To Be Implemented**.
+   - `Event`: **Implemented**.
      ```javascript
      {
        community: { type: Schema.Types.ObjectId, ref: "Community" },
@@ -214,11 +212,11 @@ This document outlines all backend features required for the LocalBiz Connect pl
      ```
 
 2. **Routes**:
-   - `POST /api/community/events` (create/edit events) - **To Be Implemented**.
-   - `GET /api/community/requests` (view/approve business requests) - **To Be Implemented**.
+   - `POST /api/community/events` (create/edit events) - **Implemented**.
+   - `GET /api/community/requests` (view/approve business requests) - **Implemented**.
 
 3. **Controllers**:
-   - Send notifications to businesses upon approval/rejection - **To Be Implemented**.
+   - Send notifications to businesses upon approval/rejection - **Implemented**.
 
 ---
 
@@ -234,17 +232,17 @@ This document outlines all backend features required for the LocalBiz Connect pl
 
 2. **Routes**:
    - `POST /admin/login` - **Implemented**.
-   - `GET /api/admin/requests` (approve/reject businesses/communities) - **To Be Implemented**.
-   - `GET /api/admin/complaints` (view/resolve complaints) - **To Be Implemented**.
-   - `GET /api/admin/analytics` (platform-wide stats) - **To Be Implemented**.
+   - `GET /api/admin/requests` (approve/reject businesses/communities) - **Implemented**.
+   - `GET /api/admin/complaints` (view/resolve complaints) - **Implemented**.
+   - `GET /api/admin/analytics` (platform-wide stats) - **Implemented**.
 
 3. **Controllers**:
-   - Use MongoDB aggregations for analytics (e.g., total users, active businesses) - **To Be Implemented**.
+   - Use MongoDB aggregations for analytics (e.g., total users, active businesses) - **Implemented**.
 
 ---
 
 ## 6. **Additional Features**
-### Chats: **To Be Implemented**.
+### Chats: **Implemented**.
 - **Model**: `Message` with `sender`, `receiver`, `content`, `timestamp`.
 - **Routes**: `POST /api/chats` (send message), `GET /api/chats` (fetch history).
 
@@ -256,8 +254,8 @@ This document outlines all backend features required for the LocalBiz Connect pl
 
 ## 7. **Database Relationships**
 - Businesses ↔ Products (One-to-Many) - **Implemented** (via `bussinessId` in `bussinessProductModel`).
-- Businesses ↔ Communities (Many-to-Many) - **To Be Implemented**.
-- Consumers ↔ Reviews (One-to-Many) - **To Be Implemented**.
+- Businesses ↔ Communities (Many-to-Many) - **Implemented**.
+- Consumers ↔ Reviews (One-to-Many) - **Implemented**.
 
 ---
 
