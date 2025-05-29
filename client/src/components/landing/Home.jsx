@@ -40,12 +40,14 @@ const Home = () => {
                         >
                             Register</Button>
                     </Link>
-                    <Button variant="contained"
-
-                        endIcon={<ArrowRightAltIcon />}
-                        sx={{ borderRadius: "15px", backgroundColor: "transparent", color: "#6F32BF" }}
-                    >
-                        Learn more</Button>
+                    <Link to="/about" style={{ textDecoration: "none" }}>
+                        <Button variant="contained"
+                            endIcon={<ArrowRightAltIcon />}
+                            sx={{ borderRadius: "15px", backgroundColor: "transparent", color: "#6F32BF" }}
+                        >
+                            Learn more
+                        </Button>
+                    </Link>
                 </Box>
                 <Box component="img" src={homemain} sx={{ height: 'auto', width: "auto", marginTop: "40px" }}></Box>
 

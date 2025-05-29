@@ -21,8 +21,8 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const pages = [
     { label: 'Home', path: '/organiser/home' },
-    { label: 'About', path: '#' },
-    { label: 'Contact', path: '#' }
+    { label: 'About', path: '/about' },
+    { label: 'Contact', path: '/contact' }
 ];
 
 const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
@@ -61,7 +61,7 @@ const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
                             justifyContent: 'space-between',
                             alignItems: 'center'
                         }}>
-                            <Link to="/customer/home">
+                            <Link to="/organiser/home">
                                 <Box component="img" src={Logo} alt='logo'
                                     sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}>
 
@@ -125,7 +125,7 @@ const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
                                 ))}
                             </Menu>
                         </Box>
-                        <Link to='/customer/home'>
+                        <Link to='/organiser/home'>
                             <Box component="img" src={Logo} sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} ></Box>
                         </Link>
                         

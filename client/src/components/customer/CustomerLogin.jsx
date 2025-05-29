@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import NavbarSigin from '../Navbar/NavbarSigin';
 import { Box, Button, Container, InputAdornment, Stack, TextField, Typography, styled } from '@mui/material';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Footer from '../Footer/Footer';
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,6 +17,7 @@ const CustomerLogin = () => {
         email: "",
         password: ""
     });
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -58,7 +60,7 @@ const CustomerLogin = () => {
                     <Typography variant="p" component="div" color='secondary' sx={{ fontSize: "32px" }}>
                         Login !
                     </Typography>
-                    <Box display={'flex'} flexDirection={'column'} alignItems={'flex-end'} >
+                    <Box component="form" onSubmit={handleLogin} display={'flex'} flexDirection={'column'} alignItems={'flex-end'} >
 
                         <Stack display={'flex'} flexDirection={'column'} gap={3}>
                             <div style={textFieldStyle}>
@@ -68,7 +70,7 @@ const CustomerLogin = () => {
                                     name='email'
                                     value={data.email}
                                     type='text'
-
+                                    autoComplete="username"
                                 />
 
                             </div>
@@ -78,18 +80,21 @@ const CustomerLogin = () => {
                                     onChange={handleInputChange}
                                     name='password'
                                     value={data.password}
-                                    type='password'
+                                    type={showPassword ? 'text' : 'password'}
+                                    autoComplete="current-password"
                                 />
-                                {data.password.length > 0 ? "" : <VisibilityOffIcon
-                                    style={{
+                                <Box
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    sx={{
                                         position: 'absolute',
                                         right: '10px',
                                         top: '70%',
                                         transform: 'translateY(-50%)',
                                         cursor: 'pointer',
                                     }}
-                                />}
-
+                                >
+                                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                </Box>
                             </div>
                         </Stack>
                         <Box display={'flex'} alignItems={'flex-end'} justifyContent={'center'}>
@@ -99,13 +104,11 @@ const CustomerLogin = () => {
                             
                         </Box>
 
-                    </Box>
 
-
-                    <Stack display={'flex'} flexDirection={'column'} alignItems={'center'} gap={2} mt={2}>
-                        <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px",mb:"20px", height: "40px", width: '200px', padding: '10px 35px' }}
-                            onClick={handleLogin}
-                        >Login</Button>
+                        <Stack display={'flex'} flexDirection={'column'} alignItems={'center'} gap={2} mt={2}>
+                            <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px",mb:"20px", height: "40px", width: '200px', padding: '10px 35px' }}
+                                type="submit"
+                            >Login</Button>
 
                         <Typography sx={{mb:"50px"}}>
                             Don't have an account? <Link to="/customer/registration"><span style={{ textDecoration: "underline",color:'black' }}>Sign up</span></Link>

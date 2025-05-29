@@ -3,6 +3,7 @@ import NavbarSigin from '../Navbar/NavbarSigin'
 import { Container, Stack, Typography, Box, TextField, styled, InputAdornment, Checkbox, Button } from '@mui/material';
 import profileFrame from "../../assets/image 42.png";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Footer from '../Footer/Footer';
 import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,6 +15,8 @@ const CustomerRegistration = () => {
   const siginupStyle = { background: "white", boxShadow: "none" }
 
   const [checked, setChecked] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (event) => {
     if (event.target.checked) {
@@ -107,20 +110,23 @@ const CustomerRegistration = () => {
           errorMessage.confirmPassword = "Password and confirm password should be same";
           isValid = false;
       }
-      if(data.address.length<10){
-          errorMessage.address="Address should be 10 char length"
-          isValid = false;
-      }
-      else if(!data.address.trim()){
+      const addressRegex = /^[a-zA-Z0-9\s,.'-]{10,}$/; // Allows alphanumeric, spaces, commas, periods, apostrophes, hyphens, min 10 chars
+      if (!data.address.trim()) {
           errorMessage.address="Address should not be empty"
           isValid = false;
       }
-      if(!data.phone.trim()){
-          errorMessage.phone="Phone should not be empty"
+      else if(!addressRegex.test(data.address)){
+          errorMessage.address="Address should be at least 10 characters long and can contain letters, numbers, spaces, and common punctuation."
           isValid = false;
       }
-      else if(data.phone.length !==10){
-          errorMessage.phone="Phone should be 10 digit"
+
+      const phoneRegex = /^\d{10}$/; // Exactly 10 digits
+      if (!data.phone.trim()) {
+          errorMessage.phone="Phone number should not be empty"
+          isValid = false;
+      }
+      else if(!phoneRegex.test(data.phone)){
+          errorMessage.phone="Phone number should be exactly 10 digits"
           isValid = false;
       }
       if(!checked){
@@ -259,24 +265,26 @@ const navigate=useNavigate();
                                 {error.email && <span style={{ color: 'red', fontSize: '12px' }}>{error.email}</span>}
                             </div>
                             <div style={textFieldStyle}>
-                                <label>New Password</label>
+                                <label>Password</label>
                                 <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
                                     onChange={handleDataChange}
                                     name='password'
                                     value={data.password}
-                                    type='password'
+                                    type={showPassword ? 'text' : 'password'}
                                 />
-                                {data.password.length > 0 ? "" : <VisibilityOffIcon
-                                    style={{
+                                <Box
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    sx={{
                                         position: 'absolute',
                                         right: '10px',
                                         top: '70%',
                                         transform: 'translateY(-50%)',
                                         cursor: 'pointer',
                                     }}
-                                />}
+                                >
+                                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                </Box>
                                 {error.password && <span style={{ color: 'red', fontSize: '12px' }}>{error.password}</span>}
-
                             </div>
                         </Stack>
                         <Stack direction={'row'} sx={{ display: "flex", gap: "25px" }}>
@@ -296,17 +304,20 @@ const navigate=useNavigate();
                                     onChange={handleDataChange}
                                     name='confirmPassword'
                                     value={data.confirmPassword}
-                                    type='password'
+                                    type={showConfirmPassword ? 'text' : 'password'}
                                 />
-                                {data.confirmPassword.length > 0 ? "" : <VisibilityOffIcon
-                                    style={{
+                                <Box
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    sx={{
                                         position: 'absolute',
                                         right: '10px',
                                         top: '70%',
                                         transform: 'translateY(-50%)',
                                         cursor: 'pointer',
                                     }}
-                                />}
+                                >
+                                    {showConfirmPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                </Box>
                                 {error.confirmPassword && <span style={{ color: 'red', fontSize: '12px' }}>{error.confirmPassword}</span>}
                             </div>
 

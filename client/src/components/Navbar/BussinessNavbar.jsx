@@ -21,8 +21,8 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const pages = [
     { label: 'Home', path: '/bussiness/home' },
-    { label: 'About', path: '#' },
-    { label: 'Contact', path: '#' }
+    { label: 'About', path: '/about' },
+    { label: 'Contact', path: '/contact' }
 ];
 
 const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {
@@ -61,7 +61,7 @@ const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {
                             justifyContent: 'space-between',
                             alignItems: 'center'
                         }}>
-                            <Link to="/customer/home">
+                            <Link to="/bussiness/home">
                                 <Box component="img" src={Logo} alt='logo'
                                     sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}>
 
@@ -125,7 +125,7 @@ const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {
                                 ))}
                             </Menu>
                         </Box>
-                        <Link to='/customer/home'>
+                        <Link to='/bussiness/home'>
                             <Box component="img" src={Logo} sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} ></Box>
                         </Link>
                         

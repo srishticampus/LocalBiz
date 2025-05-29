@@ -99,14 +99,13 @@ const Navbar = ({ contactbg = {}, aboutbg = {}, homebg = {} }) => {
                                 sx={{ display: { xs: 'block', md: 'none' } }}
                             >
                                 {pages.map((page) => (
-                                    <MenuItem key={page.label}
-                                        onClick={handleCloseNavMenu}
-
-                                    >
-                                        <Typography color='primary'
-                                            sx={{ textAlign: 'center', color: '#1967D2' }}>
-                                            {page.label}
-                                        </Typography>
+                                    <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                                        <Link to={page.path} style={{ textDecoration: "none", color: "inherit" }}>
+                                            <Typography color='primary'
+                                                sx={{ textAlign: 'center', color: '#1967D2' }}>
+                                                {page.label}
+                                            </Typography>
+                                        </Link>
                                     </MenuItem>
                                 ))}
                             </Menu>
