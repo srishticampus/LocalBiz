@@ -37,10 +37,10 @@ const CustomerLogin = () => {
             toast.success("logged in successfully!")
             navigate("/customer/home");
         }
-        if(message==="Invalid Password."){
+        if (message === "Invalid Password.") {
             toast.error("Invalid Password.")
         }
-        if(message==="customer not found with this email."){
+        if (message === "customer not found with this email.") {
             toast.error("customer not found with this email.")
         }
 
@@ -51,11 +51,11 @@ const CustomerLogin = () => {
         console.log(jwtToken);
         console.log(message);
     }
-  return (
-    <>
-    <NavbarSigin siginupStyle={siginupStyle}/>
-    <Container>
-                
+    return (
+        <>
+            <NavbarSigin siginupStyle={siginupStyle} />
+            <Container>
+
                 <Box display={'flex'} flexDirection={'column'} alignItems={'center'} sx={{ marginTop: "80px" }}>
                     <Typography variant="p" component="div" color='secondary' sx={{ fontSize: "32px" }}>
                         Login !
@@ -98,30 +98,30 @@ const CustomerLogin = () => {
                             </div>
                         </Stack>
                         <Box display={'flex'} alignItems={'flex-end'} justifyContent={'center'}>
-                            <Link to="/customer/forgotpassword" style={{textDecoration:"none"}}>
-                            <Typography variant='p' sx={{ marginTop: "10px", color:'#333333', fontSize: "12px", fontWeight: '600' }}>Forgot password</Typography>
+                            <Link to="/customer/forgotpassword" style={{ textDecoration: "none" }}>
+                                <Typography variant='p' sx={{ marginTop: "10px", color: '#333333', fontSize: "12px", fontWeight: '600' }}>Forgot password</Typography>
                             </Link>
-                            
+
                         </Box>
 
 
                         <Stack display={'flex'} flexDirection={'column'} alignItems={'center'} gap={2} mt={2}>
-                            <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px",mb:"20px", height: "40px", width: '200px', padding: '10px 35px' }}
+                            <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px", mb: "20px", height: "40px", width: '200px', padding: '10px 35px' }}
                                 type="submit"
                             >Login</Button>
 
-                        <Typography sx={{mb:"50px"}}>
-                            Don't have an account? <Link to="/customer/registration"><span style={{ textDecoration: "underline",color:'black' }}>Sign up</span></Link>
-                        </Typography>
-                    </Stack>
+                            <Typography sx={{ mb: "50px" }}>
+                                Don't have an account? <Link to="/customer/registration"><span style={{ textDecoration: "underline", color: 'black' }}>Sign up</span></Link>
+                            </Typography>
+                        </Stack>
+                    </Box>
                 </Box>
-
             </Container>
             <Footer />
 
-      
-    </>
-  )
+
+        </>
+    )
 }
 
 export default CustomerLogin
