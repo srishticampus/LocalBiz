@@ -234,7 +234,7 @@ const [editOpen, setEditOpen] = React.useState(false);
             profilePic: null, // leave this null so user can choose a new one
         });
         setImagePreview(bussiness?.profilePic 
-            ? `http://localhost:3000/uploads/${bussiness?.profilePic}` 
+            ? `${import.meta.env.VITE_API_URL}uploads/${bussiness?.profilePic}` 
             : null);
         setEditOpen(true);
     }
@@ -295,23 +295,23 @@ const [editOpen, setEditOpen] = React.useState(false);
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Discount</Typography>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Price</Typography>
-                                    <Button variant="contained"
-                                        color='secondary'
-
-                                        sx={{ borderRadius: "25px" }}
-                                    >
-                                        View</Button>
-                                </Box>
-                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Candles</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>10</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>20%</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>200</Typography>
-                                    <Link to ={`/bussiness/editproduct/${item.weight}`}>
+                                    <Link to={`/bussiness/viewproduct/${item._id}`}>
                                         <Button variant="contained"
                                             color='secondary'
-
+                                            sx={{ borderRadius: "25px" }}
+                                        >
+                                            View</Button>
+                                    </Link>
+                                </Box>
+                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
+                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>{item.productName}</Typography>
+                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>{item.stock}</Typography>
+                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>{item.specialOffer}</Typography>
+                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>{item.discount}%</Typography>
+                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>{item.price}</Typography>
+                                    <Link to ={`/bussiness/editproduct/${item._id}`}>
+                                        <Button variant="contained"
+                                            color='secondary'
                                             sx={{ borderRadius: "25px" }}
                                         >
                                             Edit</Button>

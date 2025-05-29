@@ -22,7 +22,14 @@ import SearchIcon from '@mui/icons-material/Search';
 const pages = [
     { label: 'Home', path: '/bussiness/home' },
     { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' }
+    { label: 'Contact', path: '/contact' },
+    { label: 'Community Join', path: '/bussiness/communityjoin' },
+    { label: 'Events', path: '/bussiness/events' },
+    { label: 'Trainings', path: '/bussiness/trainings' },
+    { label: 'Workshops', path: '/bussiness/workshops' },
+    { label: 'Updates', path: '/bussiness/updates' },
+    { label: 'Chats', path: '/bussiness/chats' },
+    { label: 'Complaints', path: '/bussiness/complaints' }
 ];
 
 const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {

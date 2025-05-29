@@ -4,19 +4,18 @@ import { Container, Stack, Typography, Box, Button } from '@mui/material';
 import Footer from '../Footer/Footer';
 import axios from "axios";
 import { Link } from 'react-router-dom';
-import uploadphoto from "../../assets/upphoto.png";
 import { toast } from 'react-toastify';
 import { baseUrl } from '../../baseUrl';
 
 const BussinessAddProduct = () => {
-    const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
+    const textFieldStyle = { width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
     const siginupStyle = { background: "white", boxShadow: "none" };
 
-    const [bussinessdetails,setBussinessdetails]=useState({});
-    useEffect(()=>{
-        const bussinessdetails=localStorage.getItem("bussinessDetails");
+    const [bussinessdetails, setBussinessdetails] = useState({});
+    useEffect(() => {
+        const bussinessdetails = localStorage.getItem("bussinessDetails");
         setBussinessdetails(JSON.parse(bussinessdetails));
-    })
+    }, [])
 
     const [photoPreview, setPhotoPreview] = useState(null);
 
@@ -26,7 +25,7 @@ const BussinessAddProduct = () => {
         productName: "",
         productDescription: "",
         weight: "",
-        adds: "",
+        adds: "", // Reverted to empty string
         price: "",
         stockavailable: "",
         discountPrice: "",
@@ -40,7 +39,7 @@ const BussinessAddProduct = () => {
             ...prevError,
             [name]: ""
         }));
-        
+
         setData(prev => {
             return { ...prev, [name]: value }
         })
@@ -62,6 +61,7 @@ const BussinessAddProduct = () => {
         }
 
     }
+
     const validation = () => {
         let isValid = true;
         let errorMessage = {};
@@ -84,7 +84,7 @@ const BussinessAddProduct = () => {
             isValid = false;
         }
 
-        if (!data.adds.trim()) {
+        if (!data.adds.trim()) { // Reverted validation for text
             errorMessage.adds = "adds should not be empty";
             isValid = false;
         }
@@ -131,7 +131,7 @@ const BussinessAddProduct = () => {
         formData.append('productName', data.productName);
         formData.append('productDescription', data.productDescription);
         formData.append('weight', data.weight);
-        formData.append('adds', data.adds);
+        formData.append('adds', data.adds); // Reverted to text
         formData.append('price', data.price);
         formData.append('stockavailable', data.stockavailable);
         formData.append('discountPrice', data.discountPrice);
@@ -140,15 +140,15 @@ const BussinessAddProduct = () => {
         formData.append('photo', data.photo);
         console.log(data);
         console.log(formData);
-        const token=localStorage.getItem("token")
+        const token = localStorage.getItem("token")
 
 
         const response = await axios.post(`${baseUrl}bussiness/addproduct`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data"
             }
-          });
+        });
 
         const result = response.data;
         console.log(result);
@@ -162,7 +162,7 @@ const BussinessAddProduct = () => {
                 productName: "",
                 productDescription: "",
                 weight: "",
-                adds: "",
+                adds: "", // Reset to empty string
                 price: "",
                 stockavailable: "",
                 discountPrice: "",
@@ -172,7 +172,7 @@ const BussinessAddProduct = () => {
             });
             setPhotoPreview(null);
             toast.success("Product added successfully");
-          
+
         }
 
 
@@ -186,140 +186,135 @@ const BussinessAddProduct = () => {
                     <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{ mb: "120px" }}>
                         <Typography variant='p' color='secondary' sx={{ fontSize: "32px" }}>Add Products</Typography>
                     </Box>
-                    <Box sx={{ display: "flex", justifyContent: 'center', alignItems: "start", gap: "30px", height: "293px", flexDirection: "column", marginTop: '30px' }}>
-                        <Stack direction="row" sx={{ display: "flex", gap: "25px" }}>
+                    <Box sx={{ display: "flex", flexWrap: 'wrap', justifyContent: 'center', alignItems: "start", gap: "30px", marginTop: '30px' }}>
+                        <div style={textFieldStyle}>
+                            <label>Product Name</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='productName'
+                                value={data.productName}
+                                type='text'
 
-                            <div style={textFieldStyle}>
-                                <label>Product Name</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='productName'
-                                    value={data.productName}
-                                    type='text'
+                            />
+                            {error.productName && <span style={{ color: 'red', fontSize: '12px' }}>{error.productName}</span>}
+                        </div>
 
-                                />
-                                {error.productName && <span style={{ color: 'red', fontSize: '12px' }}>{error.productName}</span>}
-                            </div>
+                        <div style={textFieldStyle}>
+                            <label>Product Description</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='productDescription'
+                                value={data.productDescription}
 
-                            <div style={textFieldStyle}>
-                                <label>Product Description</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='productDescription'
-                                    value={data.productDescription}
+                            />
+                            {error.productDescription && <span style={{ color: 'red', fontSize: '12px' }}>{error.productDescription}</span>}
+                        </div>
 
-                                />
-                                {error.productDescription && <span style={{ color: 'red', fontSize: '12px' }}>{error.productDescription}</span>}
-                            </div>
-                        </Stack>
-                        <Stack direction={'row'} sx={{ display: "flex", gap: "25px" }}>
-                            <div style={textFieldStyle}>
-                                <label>Weight</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='weight'
-                                    value={data.weight}
-                                    type='number'
-                                />
-                                {error.weight && <span style={{ color: 'red', fontSize: '12px' }}>{error.weight}</span>}
-                            </div>
-                            <div>
-                                <label>Photo</label>
-                                <input style={{ height: "40px", display: "none", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px', background: "#9B70D3" }}
-                                    type="file"
-                                    id="photo"
-                                    accept="image/*"
-                                    onChange={handlePhotoUpload}
-                                
+                        <div style={textFieldStyle}>
+                            <label>Weight</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='weight'
+                                value={data.weight}
+                                type='number'
+                            />
+                            {error.weight && <span style={{ color: 'red', fontSize: '12px' }}>{error.weight}</span>}
+                        </div>
+                        <div style={textFieldStyle}>
+                            <label>Photo</label>
+                            <input style={{ display: "none" }}
+                                type="file"
+                                id="photo"
+                                accept="image/*"
+                                onChange={handlePhotoUpload}
+                            />
+                            <label htmlFor="photo" style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", height: "40px", borderRadius: "8px", border: "1px solid #CCCCCC", padding: '8px' }}>
+                                <Button variant="contained" component="span" sx={{ background: "#E0E0E0", color: "#333", borderRadius: "5px", textTransform: "none", '&:hover': { background: "#D0D0D0" } }}>
+                                    Upload Photo
+                                </Button>
+                                <span>{data.photo ? data.photo.name : "No File Chosen"}</span>
+                            </label>
+                            {error.photo && <span style={{ color: 'red', fontSize: '12px' }}>{error.photo}</span>}
+                        </div>
 
-                                />
-                                <label htmlFor="photo" style={{ cursor: "pointer", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "15px" }}>
-                                    {!photoPreview ? (<Box component="img" src={uploadphoto} alt='photo' sx={{ width: "150px", height: "40px" }}></Box>) : (<Typography color='secondary' variant='p'>photo selected</Typography>)}
-                                </label>
-                                {error.photo && <span style={{ color: 'red', fontSize: '12px' }}>{error.photo}</span>}
-                            </div>
+                        <div style={textFieldStyle}>
+                            <label>Price</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='price'
+                                value={data.price}
+                                type='number'
+                            />
 
-                        </Stack>
-                        <Stack direction={'row'} sx={{ display: "flex", gap: "25px" }}>
-                            <div style={textFieldStyle}>
-                                <label>Adds</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='adds'
-                                    value={data.adds}
-                                    type='text'
-                                />
-                                {error.adds && <span style={{ color: 'red', fontSize: '12px' }}>{error.adds}</span>}
-                            </div>
-                            <div style={textFieldStyle}>
-                                <label>Price</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='price'
-                                    value={data.price}
-                                    type='number'
-                                />
+                            {error.price && <span style={{ color: 'red', fontSize: '12px' }}>{error.price}</span>}
+                        </div>
+                        <div style={textFieldStyle}>
+                            <label>Discount price</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='discountPrice'
+                                value={data.discountPrice}
+                                type='number'
 
-                                {error.price && <span style={{ color: 'red', fontSize: '12px' }}>{error.price}</span>}
-                            </div>
+                            />
+                            {error.discountPrice && <span style={{ color: 'red', fontSize: '12px' }}>{error.discountPrice}</span>}
+                        </div>
 
-                        </Stack>
-                        <Stack direction="row" sx={{ display: "flex", gap: "25px" }}>
+                        <div style={textFieldStyle}>
+                            <label>Stock Available</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='stockavailable'
+                                value={data.stockavailable}
+                                type='number'
 
-                            <div style={textFieldStyle}>
-                                <label>Stock Available</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='stockavailable'
-                                    value={data.stockavailable}
-                                    type='number'
+                            />
+                            {error.stockavailable && <span style={{ color: 'red', fontSize: '12px' }}>{error.stockavailable}</span>}
+                        </div>
+                        <div style={textFieldStyle}>
+                            <label>Adds</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='adds'
+                                value={data.adds}
+                                type='text'
+                            />
+                            {error.adds && <span style={{ color: 'red', fontSize: '12px' }}>{error.adds}</span>}
+                        </div>
 
-                                />
-                                {error.stockavailable && <span style={{ color: 'red', fontSize: '12px' }}>{error.stockavailable}</span>}
-                            </div>
+                        <div style={textFieldStyle}>
+                            <label>Special Offer</label>
+                            <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='specialOffer'
+                                value={data.specialOffer}
+                                type='text'
 
-                            <div style={textFieldStyle}>
-                                <label>Discount price</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='discountPrice'
-                                    value={data.discountPrice}
-                                    type='number'
+                            />
+                            {error.specialOffer && <span style={{ color: 'red', fontSize: '12px' }}>{error.specialOffer}</span>}
+                        </div>
+                        <div style={textFieldStyle}>
+                            <label>Category</label>
+                            <select style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                onChange={handleDataChange}
+                                name='category'
+                                value={data.category}
+                            >
+                                <option value="">Select Category</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Clothing">Clothing</option>
+                                <option value="Home & Kitchen">Home & Kitchen</option>
+                                <option value="Books">Books</option>
+                                <option value="Sports">Sports</option>
+                            </select>
 
-                                />
-                                {error.discountPrice && <span style={{ color: 'red', fontSize: '12px' }}>{error.discountPrice}</span>}
-                            </div>
-                        </Stack>
-                        <Stack direction="row" sx={{ display: "flex", gap: "25px" }}>
+                            {error.category && <span style={{ color: 'red', fontSize: '12px' }}>{error.category}</span>}
 
-                            <div style={textFieldStyle}>
-                                <label>Special Offer</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='specialOffer'
-                                    value={data.specialOffer}
-                                    type='text'
-
-                                />
-                                {error.specialOffer && <span style={{ color: 'red', fontSize: '12px' }}>{error.specialOffer}</span>}
-                            </div>
-                            <div style={textFieldStyle}>
-                                <label>Category</label>
-                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
-                                    onChange={handleDataChange}
-                                    name='category'
-                                    value={data.category}
-                                    type='text'
-                                />
-
-                                {error.category && <span style={{ color: 'red', fontSize: '12px' }}>{error.category}</span>}
-
-                            </div>
-                        </Stack>
+                        </div>
                     </Box>
                     {/*  */}
                     <Box display={'flex'} alignItems={'center'} justifyContent={'center'} flexDirection={'column'} sx={{ width: '253px', height: "93px", gap: '10px', mt: "100px" }}>
-                        <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px", height: "40px", width: '200px', padding: '10px 35px' }}
+                        <Button variant='contained' sx={{ background: "#9B70D3", borderRadius: "25px", marginTop: "20px", height: "40px", width: '200px', padding: '10px 35px', '&:hover': { background: "#8A60C3" } }}
                             onClick={handleSubmit}
                         >Add</Button>
 

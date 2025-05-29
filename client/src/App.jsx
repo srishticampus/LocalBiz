@@ -27,6 +27,13 @@ import OrganiserHome from './components/organiser/OrganiserHome';
 import CustomerProductView from './components/customer/CustomerProductView';
 import BussinessAddProduct from './components/bussiness/BussinessAddProduct';
 import BussinessEditProducts from './components/bussiness/BussinessEditProducts';
+import BussinessCommunityJoin from './components/bussiness/BussinessCommunityJoin';
+import BussinessEvents from './components/bussiness/BussinessEvents';
+import BussinessTrainings from './components/bussiness/BussinessTrainings';
+import BussinessWorkshops from './components/bussiness/BussinessWorkshops';
+import BussinessUpdates from './components/bussiness/BussinessUpdates';
+import BussinessChats from './components/bussiness/BussinessChats';
+import BussinessComplaints from './components/bussiness/BussinessComplaints';
 import CustomerProfile from './components/customer/CustomerProfile';
 
 
@@ -77,6 +84,13 @@ function App() {
      <Route path='/bussiness/home' element={<BussinessHome/>}/>
      <Route path='/bussiness/addproduct' element={<BussinessAddProduct/>}/>
      <Route path='/bussiness/editproduct/:id' element={<BussinessEditProducts/>}/>
+     <Route path='/bussiness/communityjoin' element={<BussinessCommunityJoin/>}/>
+     <Route path='/bussiness/events' element={<BussinessEvents/>}/>
+     <Route path='/bussiness/trainings' element={<BussinessTrainings/>}/>
+     <Route path='/bussiness/workshops' element={<BussinessWorkshops/>}/>
+     <Route path='/bussiness/updates' element={<BussinessUpdates/>}/>
+     <Route path='/bussiness/chats' element={<BussinessChats/>}/>
+     <Route path='/bussiness/complaints' element={<BussinessComplaints/>}/>
 
      {/* organiser */}
      <Route path='/organiser/registration' element={<OrganiserRegister/>}/>
