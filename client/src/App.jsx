@@ -28,6 +28,11 @@ import CustomerProductView from './components/customer/CustomerProductView';
 import BussinessAddProduct from './components/bussiness/BussinessAddProduct';
 import BussinessEditProducts from './components/bussiness/BussinessEditProducts';
 import CustomerProfile from './components/customer/CustomerProfile';
+import AdminRequests from './components/admin/AdminRequests';
+import AdminComplaints from './components/admin/AdminComplaints';
+import AdminViewUsers from './components/admin/AdminViewUsers';
+import AdminViewBusinessOwners from './components/admin/AdminViewBussinessOwners';
+import AdminViewOrganizations from './components/admin/AdminViewOrganizations';
 
 
 function App() {
@@ -58,7 +63,12 @@ function App() {
       {/* admin */}
       <Route path='/admin/login' element={<AdminLogin/>}/>
       <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
-      
+      <Route path='/admin/requests' element={<AdminRequests/>}/>
+      <Route path='/admin/complaints' element={<AdminComplaints/>}/>
+      <Route path='/admin/viewusers' element={<AdminViewUsers/>}/>
+      <Route path='/admin/bussinessowners' element={<AdminViewBusinessOwners/>}/>
+      <Route path='/admin/organizations' element={<AdminViewOrganizations/>}/>
+
      {/* customers */}
      <Route path='/customer/registration' element={<CustomerRegistration/>}/>
      <Route path='/customer/login' element={<CustomerLogin/>}/>

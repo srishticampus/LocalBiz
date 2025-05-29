@@ -28,26 +28,26 @@ const style = {
     p: 4,
 };
 
-// Sample data for all months
+// Sample data for all months with X-axis values in thousands
 const monthlyData = {
     January: {
         users: [
-            { name: 'Week 1', value: 20 },
-            { name: 'Week 2', value: 40 },
-            { name: 'Week 3', value: 60 },
-            { name: 'Week 4', value: 80 },
+            { name: '10k', value: 20 },
+            { name: '15k', value: 40 },
+            { name: '20k', value: 60 },
+            { name: '25k', value: 80 },
         ],
         business: [
-            { name: 'Week 1', value: 10 },
-            { name: 'Week 2', value: 30 },
-            { name: 'Week 3', value: 50 },
-            { name: 'Week 4', value: 70 },
+            { name: '10k', value: 10 },
+            { name: '15k', value: 30 },
+            { name: '20k', value: 50 },
+            { name: '25k', value: 70 },
         ],
         organizers: [
-            { name: 'Week 1', value: 30 },
-            { name: 'Week 2', value: 50 },
-            { name: 'Week 3', value: 70 },
-            { name: 'Week 4', value: 90 },
+            { name: '10k', value: 30 },
+            { name: '15k', value: 50 },
+            { name: '20k', value: 70 },
+            { name: '25k', value: 90 },
         ],
         userCount: 1234,
         businessCount: 567,
@@ -58,22 +58,22 @@ const monthlyData = {
     },
     February: {
         users: [
-            { name: 'Week 1', value: 25 },
-            { name: 'Week 2', value: 45 },
-            { name: 'Week 3', value: 65 },
-            { name: 'Week 4', value: 85 },
+            { name: '10k', value: 25 },
+            { name: '15k', value: 45 },
+            { name: '20k', value: 65 },
+            { name: '25k', value: 85 },
         ],
         business: [
-            { name: 'Week 1', value: 15 },
-            { name: 'Week 2', value: 35 },
-            { name: 'Week 3', value: 55 },
-            { name: 'Week 4', value: 75 },
+            { name: '10k', value: 15 },
+            { name: '15k', value: 35 },
+            { name: '20k', value: 55 },
+            { name: '25k', value: 75 },
         ],
         organizers: [
-            { name: 'Week 1', value: 35 },
-            { name: 'Week 2', value: 55 },
-            { name: 'Week 3', value: 75 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 35 },
+            { name: '15k', value: 55 },
+            { name: '20k', value: 75 },
+            { name: '25k', value: 95 },
         ],
         userCount: 1350,
         businessCount: 580,
@@ -84,22 +84,22 @@ const monthlyData = {
     },
     March: {
         users: [
-            { name: 'Week 1', value: 30 },
-            { name: 'Week 2', value: 50 },
-            { name: 'Week 3', value: 70 },
-            { name: 'Week 4', value: 90 },
+            { name: '10k', value: 30 },
+            { name: '15k', value: 50 },
+            { name: '20k', value: 70 },
+            { name: '25k', value: 90 },
         ],
         business: [
-            { name: 'Week 1', value: 20 },
-            { name: 'Week 2', value: 40 },
-            { name: 'Week 3', value: 60 },
-            { name: 'Week 4', value: 80 },
+            { name: '10k', value: 20 },
+            { name: '15k', value: 40 },
+            { name: '20k', value: 60 },
+            { name: '25k', value: 80 },
         ],
         organizers: [
-            { name: 'Week 1', value: 40 },
-            { name: 'Week 2', value: 60 },
-            { name: 'Week 3', value: 80 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 40 },
+            { name: '15k', value: 60 },
+            { name: '20k', value: 80 },
+            { name: '25k', value: 100 },
         ],
         userCount: 1480,
         businessCount: 600,
@@ -110,22 +110,22 @@ const monthlyData = {
     },
     April: {
         users: [
-            { name: 'Week 1', value: 35 },
-            { name: 'Week 2', value: 55 },
-            { name: 'Week 3', value: 75 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 35 },
+            { name: '15k', value: 55 },
+            { name: '20k', value: 75 },
+            { name: '25k', value: 95 },
         ],
         business: [
-            { name: 'Week 1', value: 25 },
-            { name: 'Week 2', value: 45 },
-            { name: 'Week 3', value: 65 },
-            { name: 'Week 4', value: 85 },
+            { name: '10k', value: 25 },
+            { name: '15k', value: 45 },
+            { name: '20k', value: 65 },
+            { name: '25k', value: 85 },
         ],
         organizers: [
-            { name: 'Week 1', value: 45 },
-            { name: 'Week 2', value: 65 },
-            { name: 'Week 3', value: 85 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 45 },
+            { name: '15k', value: 65 },
+            { name: '20k', value: 85 },
+            { name: '25k', value: 95 },
         ],
         userCount: 1600,
         businessCount: 630,
@@ -136,22 +136,22 @@ const monthlyData = {
     },
     May: {
         users: [
-            { name: 'Week 1', value: 40 },
-            { name: 'Week 2', value: 60 },
-            { name: 'Week 3', value: 80 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 40 },
+            { name: '15k', value: 60 },
+            { name: '20k', value: 80 },
+            { name: '25k', value: 100 },
         ],
         business: [
-            { name: 'Week 1', value: 30 },
-            { name: 'Week 2', value: 50 },
-            { name: 'Week 3', value: 70 },
-            { name: 'Week 4', value: 90 },
+            { name: '10k', value: 30 },
+            { name: '15k', value: 50 },
+            { name: '20k', value: 70 },
+            { name: '25k', value: 90 },
         ],
         organizers: [
-            { name: 'Week 1', value: 50 },
-            { name: 'Week 2', value: 70 },
-            { name: 'Week 3', value: 90 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 50 },
+            { name: '15k', value: 70 },
+            { name: '20k', value: 90 },
+            { name: '25k', value: 100 },
         ],
         userCount: 1750,
         businessCount: 670,
@@ -162,22 +162,22 @@ const monthlyData = {
     },
     June: {
         users: [
-            { name: 'Week 1', value: 45 },
-            { name: 'Week 2', value: 65 },
-            { name: 'Week 3', value: 85 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 45 },
+            { name: '15k', value: 65 },
+            { name: '20k', value: 85 },
+            { name: '25k', value: 95 },
         ],
         business: [
-            { name: 'Week 1', value: 35 },
-            { name: 'Week 2', value: 55 },
-            { name: 'Week 3', value: 75 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 35 },
+            { name: '15k', value: 55 },
+            { name: '20k', value: 75 },
+            { name: '25k', value: 95 },
         ],
         organizers: [
-            { name: 'Week 1', value: 55 },
-            { name: 'Week 2', value: 75 },
-            { name: 'Week 3', value: 85 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 55 },
+            { name: '15k', value: 75 },
+            { name: '20k', value: 85 },
+            { name: '25k', value: 95 },
         ],
         userCount: 1850,
         businessCount: 700,
@@ -188,22 +188,22 @@ const monthlyData = {
     },
     July: {
         users: [
-            { name: 'Week 1', value: 50 },
-            { name: 'Week 2', value: 70 },
-            { name: 'Week 3', value: 90 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 50 },
+            { name: '15k', value: 70 },
+            { name: '20k', value: 90 },
+            { name: '25k', value: 100 },
         ],
         business: [
-            { name: 'Week 1', value: 40 },
-            { name: 'Week 2', value: 60 },
-            { name: 'Week 3', value: 80 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 40 },
+            { name: '15k', value: 60 },
+            { name: '20k', value: 80 },
+            { name: '25k', value: 100 },
         ],
         organizers: [
-            { name: 'Week 1', value: 60 },
-            { name: 'Week 2', value: 80 },
-            { name: 'Week 3', value: 90 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 60 },
+            { name: '15k', value: 80 },
+            { name: '20k', value: 90 },
+            { name: '25k', value: 100 },
         ],
         userCount: 1950,
         businessCount: 730,
@@ -214,22 +214,22 @@ const monthlyData = {
     },
     August: {
         users: [
-            { name: 'Week 1', value: 55 },
-            { name: 'Week 2', value: 75 },
-            { name: 'Week 3', value: 85 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 55 },
+            { name: '15k', value: 75 },
+            { name: '20k', value: 85 },
+            { name: '25k', value: 95 },
         ],
         business: [
-            { name: 'Week 1', value: 45 },
-            { name: 'Week 2', value: 65 },
-            { name: 'Week 3', value: 85 },
-            { name: 'Week 4', value: 95 },
+            { name: '10k', value: 45 },
+            { name: '15k', value: 65 },
+            { name: '20k', value: 85 },
+            { name: '25k', value: 95 },
         ],
         organizers: [
-            { name: 'Week 1', value: 65 },
-            { name: 'Week 2', value: 85 },
-            { name: 'Week 3', value: 95 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 65 },
+            { name: '15k', value: 85 },
+            { name: '20k', value: 95 },
+            { name: '25k', value: 100 },
         ],
         userCount: 2050,
         businessCount: 760,
@@ -240,22 +240,22 @@ const monthlyData = {
     },
     September: {
         users: [
-            { name: 'Week 1', value: 60 },
-            { name: 'Week 2', value: 80 },
-            { name: 'Week 3', value: 90 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 60 },
+            { name: '15k', value: 80 },
+            { name: '20k', value: 90 },
+            { name: '25k', value: 100 },
         ],
         business: [
-            { name: 'Week 1', value: 50 },
-            { name: 'Week 2', value: 70 },
-            { name: 'Week 3', value: 90 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 50 },
+            { name: '15k', value: 70 },
+            { name: '20k', value: 90 },
+            { name: '25k', value: 100 },
         ],
         organizers: [
-            { name: 'Week 1', value: 70 },
-            { name: 'Week 2', value: 90 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 70 },
+            { name: '15k', value: 90 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
         ],
         userCount: 2150,
         businessCount: 800,
@@ -266,22 +266,22 @@ const monthlyData = {
     },
     October: {
         users: [
-            { name: 'Week 1', value: 65 },
-            { name: 'Week 2', value: 85 },
-            { name: 'Week 3', value: 95 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 65 },
+            { name: '15k', value: 85 },
+            { name: '20k', value: 95 },
+            { name: '25k', value: 100 },
         ],
         business: [
-            { name: 'Week 1', value: 55 },
-            { name: 'Week 2', value: 75 },
-            { name: 'Week 3', value: 95 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 55 },
+            { name: '15k', value: 75 },
+            { name: '20k', value: 95 },
+            { name: '25k', value: 100 },
         ],
         organizers: [
-            { name: 'Week 1', value: 75 },
-            { name: 'Week 2', value: 95 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 75 },
+            { name: '15k', value: 95 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
         ],
         userCount: 2250,
         businessCount: 830,
@@ -292,22 +292,22 @@ const monthlyData = {
     },
     November: {
         users: [
-            { name: 'Week 1', value: 70 },
-            { name: 'Week 2', value: 90 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 70 },
+            { name: '15k', value: 90 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
         ],
         business: [
-            { name: 'Week 1', value: 60 },
-            { name: 'Week 2', value: 80 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 60 },
+            { name: '15k', value: 80 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
         ],
         organizers: [
-            { name: 'Week 1', value: 80 },
-            { name: 'Week 2', value: 100 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 80 },
+            { name: '15k', value: 100 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
         ],
         userCount: 2350,
         businessCount: 870,
@@ -318,22 +318,46 @@ const monthlyData = {
     },
     December: {
         users: [
-            { name: 'Week 1', value: 75 },
-            { name: 'Week 2', value: 95 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 75 },
+            { name: '15k', value: 95 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
+            { name: '30k', value: 75 },
+            { name: '35k', value: 95 },
+            { name: '40k', value: 100 },
+            { name: '45k', value: 100 },
+            { name: '50k', value: 75 },
+            { name: '55k', value: 95 },
+            { name: '60k', value: 100 },
+            { name: '65k', value: 100 },    
         ],
         business: [
-            { name: 'Week 1', value: 65 },
-            { name: 'Week 2', value: 85 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 65 },
+            { name: '15k', value: 85 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
+            { name: '30k', value: 65 },
+            { name: '35k', value: 85 },
+            { name: '40k', value: 100 },
+            { name: '45k', value: 100 },
+            { name: '50k', value: 65 },
+            { name: '55k', value: 85 },
+            { name: '60k', value: 100 },
+            { name: '65k', value: 100 },
         ],
         organizers: [
-            { name: 'Week 1', value: 85 },
-            { name: 'Week 2', value: 100 },
-            { name: 'Week 3', value: 100 },
-            { name: 'Week 4', value: 100 },
+            { name: '10k', value: 85 },
+            { name: '15k', value: 100 },
+            { name: '20k', value: 100 },
+            { name: '25k', value: 100 },
+            { name: '30k', value: 85 },
+            { name: '35k', value: 100 },
+            { name: '40k', value: 100 },
+            { name: '45k', value: 100 },
+            { name: '50k', value: 85 },
+            { name: '55k', value: 100 },
+            { name: '60k', value: 100 },
+            { name: '65k', value: 100 },
         ],
         userCount: 2500,
         businessCount: 900,
@@ -370,18 +394,49 @@ const AdminDashboard = () => {
     // Get current month's data
     const currentData = monthlyData[timeRange];
 
-    return (
+ return (
         <>
-            <Container maxWidth="x-lg" sx={{ background: "#fffff" }}>
-                <Grid container spacing={2} sx={{ height: "100vh", width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
-                    {/* Sidebar */}
-                    <Grid item xs={6} md={2}>
+            <Container 
+                maxWidth="x-lg" 
+                sx={{ 
+                    background: "#fffff",
+                    minHeight: '100vh',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    p: 0
+                }}
+            ><Grid item xs={6} md={2} sx={{ p: 0 }}>
                         <AdminSidebar />
                     </Grid>
+                <Grid 
+                    container 
+                    spacing={2} 
+                    sx={{ 
+                        flex: 1,
+                        width: "100%", 
+                        display: "flex", 
+                        flexDirection: "column", 
+                        gap: 2,
+                        m: 0
+                    }}
+                >
+                    {/* Sidebar */}
+                    
                     
                     {/* Content (right part) */}
-                    <Grid item xs={6} md={10} sx={{ height: "100vw", display: "flex", flexDirection: "column", gap: 3, padding: "15px 0px", borderRadius: "8px", flexGrow: 1 }}>
-                        {/* Top Bar */}
+                    <Grid 
+                        item 
+                        xs={6} 
+                        md={10} 
+                        sx={{  
+                            display: "flex", 
+                            flexDirection: "column", 
+                            gap: 3, 
+                            padding: "15px 0px", 
+                            borderRadius: "8px", 
+                            flexGrow: 1 
+                        }}
+                    >                        {/* Top Bar */}
                         <Box sx={{ height: "70px", background: "white", borderRadius: "8px", width: "98%", px: 3 }} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                             <Typography variant='h3' sx={{ fontSize: "24px", fontWeight: "500" }} color='primary'>Dashboard</Typography>
                             <Button onClick={handleOpen} variant="text" color='primary' sx={{ borderRadius: "25px", height: "40px", width: '200px', padding: '10px 35px' }} startIcon={<LogoutIcon />}>logout</Button>
@@ -637,9 +692,10 @@ const AdminDashboard = () => {
                         </Card>
                     </Grid>
                 </Grid>
-                
+
             </Container>
-            <Footer/>
+                                            <Footer sx={{ mt: 'auto', width: '100%' }} />
+
             
             {/* logout modal */}
             <div>

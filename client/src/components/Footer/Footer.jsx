@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <>
       <Container maxWidth={false} disableGutters  sx={{ backgroundColor: "#333333",margin:0,padding:0,height:"auto",bottom:0,position:"static"}}>
-                <Stack sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexDirection: "row", marginTop: '40px' }}>
+                <Stack sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexDirection: "row", marginTop: '40px' ,width:"100%"}}>
                     <Box sx={{ display: "flex", flexDirection: "column", justifyContent: 'start', alignItems: "flex-start", marginTop: '10px', marginLeft: "50px" }}>
                         <Box sx={{ width: "372px", height: "115px", display: "flex", justifyContent: "flex-start", alignItems: 'center' }}>
                             <Box component="img" src={logo} alt='logo'></Box>

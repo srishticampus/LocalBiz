@@ -21,8 +21,8 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const pages = [
     { label: 'Home', path: '/customer/home' },
-    { label: 'About', path: '#' },
-    { label: 'Contact', path: '#' }
+    { label: 'About', path: '/about' },
+    { label: 'Contact', path: '/contact' }
 ];
 
 const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
