@@ -19,16 +19,13 @@ import { baseUrl } from '../../baseUrl';
 
 const CustomerHome = () => {
     const styleLogout = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
+        width: { xs: '90%', sm: 400 },
         bgcolor: 'background.paper',
-        // border: '2px solid #000',
         borderRadius: "10px",
         boxShadow: 24,
         p: 4,
+        mx: 'auto',
+        my: 'auto',
     };
     const [customer, setCustomer] = useState({});
     const fetchUser = async () => {
@@ -70,20 +67,17 @@ const CustomerHome = () => {
     // loging out and not returing to profile page
     
     // for profile 
-    const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" };
+    const textFieldStyle = { flex: 1, display: "flex", flexDirection: "column", justifyContent: "start" };
 
     const styleEditBox = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '840px',
+        width: { xs: '90%', md: '840px' },
         height: 'auto',
         bgcolor: 'white',
-        // border: '2px solid #000',
         borderRadius: "20px",
         boxShadow: 24,
         p: 4,
+        mx: 'auto',
+        my: 'auto',
     };
     const [data, setData] = useState({
         name: "",
@@ -244,37 +238,45 @@ const [editOpen, setEditOpen] = React.useState(false);
         <>
         
             <CustomerNavbar customerdetails={customer} onAvatarClick={onAvatarClick} />
-            {showProfileCard && (<ClickAwayListener onClickAway={() => setShowProfileCard(false)}>
-            <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5 ,width:"375px"}}>
-            <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
-                <Avatar sx={{ height: "146px", width: "146px", position: "absolute", top: "50px", left: "100px", zIndex: 2 }} src={`http://localhost:3000/uploads/${customer?.profilePic?.filename}`} alt={customer?.name}></Avatar>
-                <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
-                    <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }}></Box>
-                </Box>
-                <Box display={"flex"} flexDirection={"column"} alignItems={"center"} p={2} sx={{ gap: "15px", mt: "90px" }}>
-                    <Typography variant='h5' color='secondary' sx={{ fontSize: "24px", fontWeight: "400" }}>{customer.name}</Typography>
-                    <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><EmailOutlinedIcon />{customer.email}</Typography>
-                    <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocalPhoneOutlinedIcon />{customer.phone}</Typography>
-                    <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocationOnOutlinedIcon />{customer.address}</Typography>
-                    <Box display={"flex"} gap={3} alignItems={"center"}>
-                    <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleEditOpen}>Edit</Button>
-                    <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleOpen}>Logout</Button>
+            {showProfileCard && (
+                <ClickAwayListener onClickAway={() => setShowProfileCard(false)}>
+                    <Box sx={{
+                        position: 'fixed', // Use fixed to position relative to viewport
+                        top: { xs: 70, sm: 80 },
+                        right: { xs: 10, sm: 20, md: 60 },
+                        width: { xs: '90%', sm: '375px' },
+                        zIndex: 1300, // A common zIndex for modals/popovers in MUI
+                        display: 'flex',
+                        justifyContent: 'flex-end', // Align to the right
+                    }}>
+                        <Card sx={{ width: { xs: '100%', sm: '375px' }, height: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', p: '25px' }}>
+                                <Box component="img" src={arrow} />
+                            </Box>
+                            <Avatar sx={{ height: "146px", width: "146px", mt: "-73px" }} src={`http://localhost:3000/uploads/${customer?.profilePic?.filename}`} alt={customer?.name}></Avatar>
+                            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} p={2} sx={{ gap: "15px", mt: "20px" }}>
+                                <Typography variant='h5' color='secondary' sx={{ fontSize: "24px", fontWeight: "400" }}>{customer.name}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><EmailOutlinedIcon />{customer.email}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocalPhoneOutlinedIcon />{customer.phone}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocationOnOutlinedIcon />{customer.address}</Typography>
+                                <Box display={"flex"} gap={3} alignItems={"center"}>
+                                    <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleEditOpen}>Edit</Button>
+                                    <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleOpen}>Logout</Button>
+                                </Box>
+                            </Box>
+                        </Card>
                     </Box>
-                </Box>
-
-            </Card>
-        </Box>
-        </ClickAwayListener>
-           ) }
-            <Typography variant='p' sx={{ fontSize: "24px", fontWeight: "400", color: "black", ml: "75px", mt: "20px" }}>Products</Typography>
-            <Box sx={{ height: "100%", border: "1px solid black", borderRadius: "15px", margin: "20px 75px", position: "relative", zIndex: -3 }}>
+                </ClickAwayListener>
+            )}
+            <Typography variant='p' sx={{ fontSize: "24px", fontWeight: "400", color: "black", ml: { xs: '10px', md: '75px' }, mt: "20px" }}>Products</Typography>
+            <Box sx={{ height: "100%", border: "1px solid black", borderRadius: "15px", margin: { xs: '20px 10px', md: '20px 75px' } }}>
 
 
                 <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
+                    <Grid xs={12} sm={6} md={6}>
+                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: { xs: '10px', md: '20px' }, height: 'auto', border: "1px solid black", borderRadius: "10px", padding: "20px", flexDirection: { xs: 'column', sm: 'row' } }}>
                             <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
+                            <Box sx={{ gap: { xs: '10px', md: '150px' } }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"} flexDirection={{ xs: 'column', sm: 'row' }}>
                                 <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
@@ -292,6 +294,7 @@ const [editOpen, setEditOpen] = React.useState(false);
                                         color='secondary'
                                         endIcon={<ArrowRightAltIcon />}
                                         sx={{ borderRadius: "25px" }}
+                                        onClick={() => navigate('/customer/viewproduct')}
                                     >
                                         View</Button>
                                 </Box>
@@ -299,10 +302,10 @@ const [editOpen, setEditOpen] = React.useState(false);
 
                         </Box>
                     </Grid>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
+                    <Grid xs={12} sm={6} md={6}>
+                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: { xs: '10px', md: '20px' }, height: 'auto', border: "1px solid black", borderRadius: "10px", padding: "20px", flexDirection: { xs: 'column', sm: 'row' } }}>
                             <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
+                            <Box sx={{ gap: { xs: '10px', md: '150px' } }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"} flexDirection={{ xs: 'column', sm: 'row' }}>
                                 <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
@@ -320,6 +323,7 @@ const [editOpen, setEditOpen] = React.useState(false);
                                         color='secondary'
                                         endIcon={<ArrowRightAltIcon />}
                                         sx={{ borderRadius: "25px" }}
+                                        onClick={() => navigate('/customer/viewproduct')}
                                     >
                                         View</Button>
                                 </Box>
@@ -327,10 +331,10 @@ const [editOpen, setEditOpen] = React.useState(false);
 
                         </Box>
                     </Grid>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
+                    <Grid xs={12} sm={6} md={6}>
+                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: { xs: '10px', md: '20px' }, height: 'auto', border: "1px solid black", borderRadius: "10px", padding: "20px", flexDirection: { xs: 'column', sm: 'row' } }}>
                             <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
+                            <Box sx={{ gap: { xs: '10px', md: '150px' } }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"} flexDirection={{ xs: 'column', sm: 'row' }}>
                                 <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
@@ -348,6 +352,7 @@ const [editOpen, setEditOpen] = React.useState(false);
                                         color='secondary'
                                         endIcon={<ArrowRightAltIcon />}
                                         sx={{ borderRadius: "25px" }}
+                                        onClick={() => navigate('/customer/viewproduct')}
                                     >
                                         View</Button>
                                 </Box>
@@ -355,10 +360,10 @@ const [editOpen, setEditOpen] = React.useState(false);
 
                         </Box>
                     </Grid>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
+                    <Grid xs={12} sm={6} md={6}>
+                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: { xs: '10px', md: '20px' }, height: 'auto', border: "1px solid black", borderRadius: "10px", padding: "20px", flexDirection: { xs: 'column', sm: 'row' } }}>
                             <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
+                            <Box sx={{ gap: { xs: '10px', md: '150px' } }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"} flexDirection={{ xs: 'column', sm: 'row' }}>
                                 <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
@@ -376,6 +381,7 @@ const [editOpen, setEditOpen] = React.useState(false);
                                         color='secondary'
                                         endIcon={<ArrowRightAltIcon />}
                                         sx={{ borderRadius: "25px" }}
+                                        onClick={() => navigate('/customer/viewproduct')}
                                     >
                                         View</Button>
                                 </Box>
@@ -383,10 +389,10 @@ const [editOpen, setEditOpen] = React.useState(false);
 
                         </Box>
                     </Grid>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
+                    <Grid xs={12} sm={6} md={6}>
+                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: { xs: '10px', md: '20px' }, height: 'auto', border: "1px solid black", borderRadius: "10px", padding: "20px", flexDirection: { xs: 'column', sm: 'row' } }}>
                             <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
+                            <Box sx={{ gap: { xs: '10px', md: '150px' } }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"} flexDirection={{ xs: 'column', sm: 'row' }}>
                                 <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
                                     <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
@@ -404,90 +410,7 @@ const [editOpen, setEditOpen] = React.useState(false);
                                         color='secondary'
                                         endIcon={<ArrowRightAltIcon />}
                                         sx={{ borderRadius: "25px" }}
-                                    >
-                                        View</Button>
-                                </Box>
-                            </Box>
-
-                        </Box>
-                    </Grid>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
-                            <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
-                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Discount</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Price</Typography>
-                                </Box>
-                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Candles</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>10</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>20%</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>200</Typography>
-                                    <Button variant="contained"
-                                        color='secondary'
-                                        endIcon={<ArrowRightAltIcon />}
-                                        sx={{ borderRadius: "25px" }}
-                                    >
-                                        View</Button>
-                                </Box>
-                            </Box>
-
-                        </Box>
-                    </Grid>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
-                            <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
-                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Discount</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Price</Typography>
-                                </Box>
-                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Candles</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>10</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>20%</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>200</Typography>
-                                    <Button variant="contained"
-                                        color='secondary'
-                                        endIcon={<ArrowRightAltIcon />}
-                                        sx={{ borderRadius: "25px" }}
-                                    >
-                                        View</Button>
-                                </Box>
-                            </Box>
-
-                        </Box>
-                    </Grid>
-                    <Grid size={6}>
-                        <Box display={"flex"} alignItems={"center"} sx={{ margin: "20px", gap: "20px", height: "291px", border: "1px solid black", borderRadius: "10px", padding: "20px" }}>
-                            <Box component="img" src={coin}></Box>
-                            <Box sx={{ gap: "150px" }} display={"flex"} justifyContent={"start"} alignItems={"flex-start"}>
-                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Product</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Stock Available</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Discount</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Price</Typography>
-                                </Box>
-                                <Box gap={2} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"flex-start"}>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Candles</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>10</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>Special Offer</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>20%</Typography>
-                                    <Typography variant='p' sx={{ fontSize: "18px", fontWeight: "400", color: "black" }}>200</Typography>
-                                    <Button variant="contained"
-                                        color='secondary'
-                                        endIcon={<ArrowRightAltIcon />}
-                                        sx={{ borderRadius: "25px" }}
+                                        onClick={() => navigate('/customer/viewproduct')}
                                     >
                                         View</Button>
                                 </Box>
@@ -558,7 +481,7 @@ const [editOpen, setEditOpen] = React.useState(false);
                                 <CloseIcon onClick={handleEditClose} sx={{ fontSize: "18px" }} />
                             </Box>
                             <hr />
-                            <Container sx={{ position: "relative" }} maxWidth="x-lg">
+                            <Container maxWidth="x-lg">
 
                                 <Box display={'flex'} alignItems={'center'} justifyContent={'center'} flexDirection={'column'}>
                                     <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>

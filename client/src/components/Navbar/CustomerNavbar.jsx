@@ -48,45 +48,58 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
   return (
     <>
       <AppBar position="static" sx={{ backgroundColor: 'transparent',boxShadow:"none"}}>
-                <Container maxWidth="xl">
+                <Container maxWidth="xl" sx={{ px: { xs: 2, md: 4 } }}>
                     <Toolbar disableGutters
                         sx={{
                             display: 'flex',
                             justifyContent: 'space-between',
-                            alignItems: 'center'
+                            alignItems: 'center',
+                            flexWrap: 'wrap', // Allow items to wrap on smaller screens
                         }}
                     >
+                        {/* Logo for medium and larger screens */}
                         <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
+                            display: { xs: 'none', md: 'flex' },
+                            alignItems: 'center',
+                            flexShrink: 0, // Prevent shrinking
                         }}>
                             <Link to="/customer/home">
                                 <Box component="img" src={Logo} alt='logo'
-                                    sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}>
-
-                                </Box>
+                                    sx={{ mr: 1, height: '40px' }} // Adjust logo size
+                                />
                             </Link>
-                            
                         </Box>
 
-                        <Box sx={{ml:"100px"}}> 
-                        <TextField
-      variant="outlined"
-      placeholder="Search..."
-      size="small"
-      sx={{ width: 300 }}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon color="action" />
-          </InputAdornment>
-        ),
-      }}
-    />
+                        {/* Search Bar */}
+                        <Box sx={{
+                            flexGrow: { xs: 1, md: 0 }, // Allow search bar to grow on small screens
+                            ml: { xs: 0, md: 'auto' }, // Remove left margin on small screens, auto on md
+                            mr: { xs: 0, md: 2 }, // Add some right margin on md
+                            width: { xs: '100%', sm: 'auto' }, // Full width on xs, auto on sm
+                            order: { xs: 3, md: 0 }, // Order on small screens (below logo/menu)
+                            mt: { xs: 2, md: 0 }, // Top margin on small screens
+                            display: 'flex',
+                            justifyContent: 'center',
+                        }}>
+                            <TextField
+                                variant="outlined"
+                                placeholder="Search..."
+                                size="small"
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon color="action" />
+                                            </InputAdornment>
+                                        ),
+                                    }
+                                }}
+                                sx={{ width: { xs: '100%', sm: 300, md: 350 } }} // Responsive width
+                            />
                         </Box>
 
-                        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                        {/* Mobile Menu Icon and Logo */}
+                        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
                             <IconButton
                                 size="large"
                                 aria-label="account of current user"
@@ -94,6 +107,7 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
                                 aria-haspopup="true"
                                 onClick={handleOpenNavMenu}
                                 color="inherit"
+                                sx={{ p: 0 }} // Remove padding
                             >
                                 <MenuIcon sx={{ color: "#384371" }} />
                             </IconButton>
@@ -115,6 +129,7 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
                             >
                                 {pages.map((page) => (
                                     <MenuItem key={page.label}
+                                        component={Link} // Use Link component for navigation
                                         to={page.path}
                                         onClick={handleCloseNavMenu}>
                                         <Typography color='primary'
@@ -124,43 +139,58 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
                                     </MenuItem>
                                 ))}
                             </Menu>
+                            <Link to='/customer/home' style={{ textDecoration: 'none', marginLeft: 'auto' }}>
+                                <Box component="img" src={Logo} sx={{ height: '40px' }} /> {/* Adjust logo size */}
+                            </Link>
                         </Box>
-                        <Link to='/customer/home'>
-                            <Box component="img" src={Logo} sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} ></Box>
-                        </Link>
-                        
-                        <Box sx={{ml:"200px", flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', gap: "40px" }}>
+
+                        {/* Desktop Navigation Links */}
+                        <Box sx={{
+                            flexGrow: 1,
+                            display: { xs: 'none', md: 'flex' },
+                            justifyContent: 'center',
+                            gap: { md: '20px', lg: '40px' }, // Responsive gap
+                            order: { xs: 2, md: 0 }, // Order on small screens (below logo/menu)
+                        }}>
                             {pages.map((page) => (
                                 <Link style={{ textDecoration: "none" }}
                                     key={page.label}
                                     onClick={handleCloseNavMenu}
                                     to={page.path}
-
                                 >
-                                    <Typography color='primary'sx={{
-                                        my: 2, fontSize: "14px", fontWeight: "500", color: location.pathname === page.path ? "#6F32BF" : "none", display: 'block', textTransform: "inherit", '&:hover': {
-                                            // borderBottom: "1px solid #1967D2",
+                                    <Typography color='primary' sx={{
+                                        my: 2,
+                                        fontSize: { md: "13px", lg: "14px" }, // Responsive font size
+                                        fontWeight: "500",
+                                        color: location.pathname === page.path ? "#6F32BF" : "inherit", // Use inherit for default color
+                                        display: 'block',
+                                        textTransform: "inherit",
+                                        '&:hover': {
                                             color: '#1967D2'
                                         }
                                     }}> {page.label}</Typography>
-
                                 </Link>
                             ))}
                         </Box>
-                        <Box display={"flex"} justifyContent={"space-around"} alignItems={"center"} sx={{ mr:"100px",flexGrow: 0, gap: "50px" }}>
-                        <SmsOutlinedIcon color='primary' sx={{ height: '24px' }} />
+
+                        {/* User Icons and Avatar */}
+                        <Box display={"flex"} justifyContent={"flex-end"} alignItems={"center"} sx={{
+                            flexGrow: { xs: 1, md: 0 }, // Allow icons to grow on small screens
+                            gap: { xs: '15px', md: '30px', lg: '50px' }, // Responsive gap
+                            order: { xs: 1, md: 0 }, // Order on small screens (next to mobile menu)
+                            mt: { xs: 2, md: 0 }, // Top margin on small screens
+                        }}>
+                            <SmsOutlinedIcon color='primary' sx={{ height: '24px' }} />
                             <NotificationsOutlinedIcon color='primary' sx={{ height: '24px' }} />
-                            
-                            <Box display={"flex"} justifyContent={"center"} alignItems={"center"} sx={{ gap: "30px" }}>
-                                <Typography color='secondary'>Hi,{customerdetails?.name} </Typography>
-                            
+
+                            <Box display={"flex"} justifyContent={"center"} alignItems={"center"} sx={{ gap: "10px" }}>
+                                <Typography color='secondary' sx={{ display: { xs: 'none', sm: 'block' } }}>Hi,{customerdetails?.name} </Typography>
+
                                 {customerdetails?.profilePic?.filename ? (
-                                    <Avatar onClick={onAvatarClick} src={`http://localhost:3000/uploads/${customerdetails?.profilePic?.filename}`} alt={customerdetails?.name} />
+                                    <Avatar onClick={onAvatarClick} src={`${import.meta.env.VITE_API_URL}uploads/${customerdetails?.profilePic?.filename}`} alt={customerdetails?.name} />
                                 ) : (
                                     <Avatar onClick={onAvatarClick} >{customerdetails?.name?.charAt(0)}</Avatar>
                                 )}
-
-
                             </Box>
                         </Box>
                     </Toolbar>
