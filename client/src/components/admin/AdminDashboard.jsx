@@ -373,14 +373,14 @@ const AdminDashboard = () => {
     return (
         <>
             <Container maxWidth="x-lg" sx={{ background: "#fffff" }}>
-                <Grid container spacing={2} sx={{ height: "100vh", width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
+                <Grid container spacing={2} sx={{  width: "100%", display: "flex", gap: 2,flexWrap:"nowrap" }}>
                     {/* Sidebar */}
                     <Grid item xs={6} md={2}>
                         <AdminSidebar />
                     </Grid>
                     
                     {/* Content (right part) */}
-                    <Grid item xs={6} md={10} sx={{ height: "100vw", display: "flex", flexDirection: "column", gap: 3, padding: "15px 0px", borderRadius: "8px", flexGrow: 1 }}>
+                    <Grid item xs={6} md={10} sx={{ display: "flex", flexDirection: "column", gap: 3, padding: "15px 0px", borderRadius: "8px", flexGrow: 1 }}>
                         {/* Top Bar */}
                         <Box sx={{ height: "70px", background: "white", borderRadius: "8px", width: "98%", px: 3 }} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                             <Typography variant='h3' sx={{ fontSize: "24px", fontWeight: "500" }} color='primary'>Dashboard</Typography>
