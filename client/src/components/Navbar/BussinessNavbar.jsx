@@ -25,7 +25,11 @@ const pages = [
     { label: 'Contact', path: '#' }
 ];
 
-const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {
+const BussinessNavbar = ({onAvatarClick}) => {
+
+    const bussinessdetails = JSON.parse(localStorage.getItem("bussinessDetails"))
+    console.log(bussinessdetails);
+    
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -155,7 +159,7 @@ const BussinessNavbar = ({bussinessdetails={},onAvatarClick}) => {
                                 <Typography color='secondary'>Hi,{bussinessdetails?.name} </Typography>
                             
                                 {bussinessdetails?.profilePic? (
-                                    <Avatar onClick={onAvatarClick} src={`http://localhost:3000/uploads/${bussinessdetails?.profilePic}`} alt={bussinessdetails?.name}  />
+                                    <Avatar onClick={onAvatarClick} src={`http://localhost:4056/uploads/${bussinessdetails?.bussinessLogo?.filename}`} alt={bussinessdetails?.name}  />
                                 ) : (
                                     <Avatar onClick={onAvatarClick}>{bussinessdetails?.name?.charAt(0)}</Avatar>
                                 )}

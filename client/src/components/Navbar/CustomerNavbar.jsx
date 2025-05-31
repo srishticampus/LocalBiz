@@ -21,11 +21,11 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const pages = [
     { label: 'Home', path: '/customer/home' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' }
+    { label: 'About', path: '/customer/AboutUs' },
+    { label: 'Contact', path: '/customer/Contact' }
 ];
 
-const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
+const CustomerNavbar = ({ onAvatarClick }) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -45,9 +45,13 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
     };
 
     const location = useLocation();
-  return (
-    <>
-      <AppBar position="static" sx={{ backgroundColor: 'transparent',boxShadow:"none"}}>
+
+const customerdetails = JSON.parse(localStorage.getItem("customerDetails"));   
+ console.log(customerdetails);
+    
+    return (
+        <>
+            <AppBar position="static" sx={{ backgroundColor: 'transparent', boxShadow: "none" }}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters
                         sx={{
@@ -67,23 +71,23 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
 
                                 </Box>
                             </Link>
-                            
+
                         </Box>
 
-                        <Box sx={{ml:"100px"}}> 
-                        <TextField
-      variant="outlined"
-      placeholder="Search..."
-      size="small"
-      sx={{ width: 300 }}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon color="action" />
-          </InputAdornment>
-        ),
-      }}
-    />
+                        <Box sx={{ ml: "100px" }}>
+                            <TextField
+                                variant="outlined"
+                                placeholder="Search..."
+                                size="small"
+                                sx={{ width: 300 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon color="action" />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
                         </Box>
 
                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -128,8 +132,8 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
                         <Link to='/customer/home'>
                             <Box component="img" src={Logo} sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} ></Box>
                         </Link>
-                        
-                        <Box sx={{ml:"200px", flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', gap: "40px" }}>
+
+                        <Box sx={{ ml: "200px", flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', gap: "40px" }}>
                             {pages.map((page) => (
                                 <Link style={{ textDecoration: "none" }}
                                     key={page.label}
@@ -137,7 +141,7 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
                                     to={page.path}
 
                                 >
-                                    <Typography color='primary'sx={{
+                                    <Typography color='primary' sx={{
                                         my: 2, fontSize: "14px", fontWeight: "500", color: location.pathname === page.path ? "#6F32BF" : "none", display: 'block', textTransform: "inherit", '&:hover': {
                                             // borderBottom: "1px solid #1967D2",
                                             color: '#1967D2'
@@ -147,15 +151,18 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
                                 </Link>
                             ))}
                         </Box>
-                        <Box display={"flex"} justifyContent={"space-around"} alignItems={"center"} sx={{ mr:"100px",flexGrow: 0, gap: "50px" }}>
-                        <SmsOutlinedIcon color='primary' sx={{ height: '24px' }} />
-                            <NotificationsOutlinedIcon color='primary' sx={{ height: '24px' }} />
-                            
+                        <Box display={"flex"} justifyContent={"space-around"} alignItems={"center"} sx={{ mr: "100px", flexGrow: 0, gap: "50px" }}>
+                            <Link to='/customer/msg/compaint'>
+                            <SmsOutlinedIcon color='primary' sx={{ height: '24px' }} />
+
+                            </Link>
+                            {/* <NotificationsOutlinedIcon color='primary' sx={{ height: '24px' }} /> */}
+
                             <Box display={"flex"} justifyContent={"center"} alignItems={"center"} sx={{ gap: "30px" }}>
                                 <Typography color='secondary'>Hi,{customerdetails?.name} </Typography>
-                            
+
                                 {customerdetails?.profilePic?.filename ? (
-                                    <Avatar onClick={onAvatarClick} src={`http://localhost:3000/uploads/${customerdetails?.profilePic?.filename}`} alt={customerdetails?.name} />
+                                    <Avatar onClick={onAvatarClick} src={`http://localhost:4056/uploads/${customerdetails?.profilePic?.filename}`} alt={customerdetails?.name} />
                                 ) : (
                                     <Avatar onClick={onAvatarClick} >{customerdetails?.name?.charAt(0)}</Avatar>
                                 )}
@@ -166,9 +173,9 @@ const CustomerNavbar = ({customerdetails={},onAvatarClick}) => {
                     </Toolbar>
                 </Container>
             </AppBar>
-        
-    </>
-  )
+
+        </>
+    )
 }
 
 export default CustomerNavbar

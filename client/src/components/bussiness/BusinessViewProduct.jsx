@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import CustomerNavbar from '../Navbar/CustomerNavbar';
+import BusinessNavbar from '../Navbar/BussinessNavbar';
 import { Box, Button, Typography, Avatar, Modal, Fade, Backdrop, Card, TextField, Stack, Container } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import coin from "../../assets/image 94.png";
 import Footer from '../Footer/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
@@ -16,7 +15,7 @@ import ClickAwayListener from '@mui/material/ClickAwayListener';
 import CloseIcon from '@mui/icons-material/Close';
 import { baseUrl } from '../../baseUrl';
 
-const CustomerProductView = () => {
+const BusinessViewProduct = () => {
     // Styled components
     const StyledTextField = styled(TextField)({
         borderRadius: "8px",
@@ -57,7 +56,8 @@ const CustomerProductView = () => {
     };
 
     // State management
-    const [customer, setCustomer] = useState({});
+    const [business, setBusiness] = useState({});
+    const [product, setProduct] = useState(null);
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [showProfileCard, setShowProfileCard] = useState(false);
@@ -71,37 +71,56 @@ const CustomerProductView = () => {
     const [error, setError] = useState({});
     const [imagePreview, setImagePreview] = useState(null);
     const navigate = useNavigate();
+    const { id } = useParams();
 
-    // Fetch customer data
+    // Fetch business data
     const fetchUser = async () => {
         const token = localStorage.getItem('token');
         const decoded = jwtDecode(token);
-        const customer = await axios.get(`${baseUrl}customer/getcustomer/${decoded.id}`, {
+        const business = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
-        localStorage.setItem("customerDetails", JSON.stringify(customer.data.customer));
-        setCustomer(customer.data.customer);
+        localStorage.setItem("bussinessDetails", JSON.stringify(business.data.bussiness));
+        setBusiness(business.data.bussiness);
+    };
+
+    // Fetch product data
+    const fetchProduct = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${baseUrl}bussiness/getproduct/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setProduct(response.data.product);
+        } catch (error) {
+            console.error("Error fetching product:", error);
+            toast.error("Error fetching product details");
+            navigate('/bussiness/home');
+        }
     };
 
     useEffect(() => {
         fetchUser();
-    }, []);
+        fetchProduct();
+    }, [id]);
 
     // Modal handlers
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const handleEditOpen = () => {
         setData({
-            name: customer.name || "",
-            email: customer.email || "",
-            address: customer.address || "",
-            phone: customer.phone || "",
+            name: business.name || "",
+            email: business.email || "",
+            address: business.address || "",
+            phone: business.phone || "",
             profilePic: null,
         });
-        setImagePreview(customer?.profilePic?.filename
-            ? `${baseUrl}uploads/${customer?.profilePic?.filename}`
+        setImagePreview(business?.profilePic
+            ? `${baseUrl}uploads/${business?.profilePic}`
             : null);
         setEditOpen(true);
     };
@@ -110,8 +129,8 @@ const CustomerProductView = () => {
     // Logout handler
     const handleLogOut = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('customerDetails');
-        navigate('/customer/login');
+        localStorage.removeItem('bussinessDetails');
+        navigate('/bussiness/login');
         toast.success("You have been logged out");
     };
 
@@ -199,13 +218,13 @@ const CustomerProductView = () => {
 
         const token = localStorage.getItem("token");
         try {
-            const updated = await axios.post(`${baseUrl}customer/editcustomer/${customer._id}`, formData, {
+            const updated = await axios.post(`${baseUrl}bussiness/editBussiness/${business._id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            if (updated.data.message === "Customer updated successfully.") {
+            if (updated.data.message === "bussiness updated successfully.") {
                 toast.success("Profile updated successfully.");
                 setEditOpen(false);
                 fetchUser();
@@ -230,14 +249,18 @@ const CustomerProductView = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) {
-            navigate("/customer/login");
+            navigate("/bussiness/login");
             return;
         }
     }, []);
 
+    if (!product) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
-            <CustomerNavbar customerdetails={customer} onAvatarClick={onAvatarClick} />
+            <BusinessNavbar bussinessdetails={business} onAvatarClick={onAvatarClick} />
             
             {/* Profile Card */}
             {showProfileCard && (
@@ -253,24 +276,24 @@ const CustomerProductView = () => {
                                     left: "100px", 
                                     zIndex: 2 
                                 }}
-                                src={`${baseUrl}uploads/${customer?.profilePic?.filename}`} 
-                                alt={customer?.name}
+                                src={`${baseUrl}uploads/${business?.profilePic}`} 
+                                alt={business?.name}
                             />
                             <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
                                 <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }} />
                             </Box>
                             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} p={2} sx={{ gap: "15px", mt: "90px" }}>
                                 <Typography variant='h5' color='secondary' sx={{ fontSize: "24px", fontWeight: "400" }}>
-                                    {customer.name}
+                                    {business.name}
                                 </Typography>
                                 <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}>
-                                    <EmailOutlinedIcon />{customer.email}
+                                    <EmailOutlinedIcon />{business.email}
                                 </Typography>
                                 <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}>
-                                    <LocalPhoneOutlinedIcon />{customer.phone}
+                                    <LocalPhoneOutlinedIcon />{business.phone}
                                 </Typography>
                                 <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}>
-                                    <LocationOnOutlinedIcon />{customer.address}
+                                    <LocationOnOutlinedIcon />{business.address}
                                 </Typography>
                                 <Box display={"flex"} gap={3} alignItems={"center"}>
                                     <Button 
@@ -297,47 +320,89 @@ const CustomerProductView = () => {
             )}
 
             {/* Product View Content */}
-            <Box>
-                <Typography sx={{ fontSize: "24px", fontWeight: "400", ml: "150px" }} variant='h4'>View Products</Typography>
+            <Box sx={{ margin: '20px 75px' }}>
+                <Typography variant='h4' sx={{ fontSize: "24px", fontWeight: "400", color: "black" }}>Product Details</Typography>
             </Box>
-            <Box display={"flex"} alignItems={"start"} sx={{ ml: "150px", mt: "60px", gap: "70px" }}>
-                <Box sx={{ gap: "20px" }} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"center"}>
-                    <Box sx={{ height: "575px", width: "500px" }} component="img" src={coin} alt='coin'></Box>
-                    <Box sx={{ gap: "20px", mt: "20px" ,mb:"50px"}} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"start"}>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>Reviews and Ratings</Typography>
-                        <textarea rows={4} style={{ width: "360px" }}></textarea>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>3.5★</Typography>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>12,371 Ratings &</Typography>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>871 Reviews</Typography>
+
+            <Box sx={{ 
+                height: "100%", 
+                border: "1px solid black", 
+                borderRadius: "15px", 
+                margin: "20px 75px",
+                padding: "20px"
+            }}>
+                <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={4}>
+                    {/* Product Image */}
+                    <Box sx={{ flex: 1 }}>
+                        <Box 
+                            component="img" 
+                            src={`${baseUrl}uploads/${product.photo?.filename}`} 
+                            alt={product.productName}
+                            sx={{ 
+                                width: "100%", 
+                                maxHeight: "400px",
+                                objectFit: 'contain',
+                                borderRadius: '8px'
+                            }} 
+                        />
                     </Box>
-                </Box>
-                <Box sx={{ gap: "80px" }} display={"flex"} justifyContent={"center"} alignItems={"start"}>
-                    <Box sx={{ gap: "40px",width:"500px" }} display={"flex"} flexDirection={"column"} alignItems={"start"}>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Product Name</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Color</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Weight</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Adds</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Stock Available</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Price</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Special Offer</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Discount Price</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Description</Typography>
-                    </Box>
-                    <Box display={"flex"} flexDirection={"column"} alignItems={"end"} sx={{gap:'100px',mr:"100px"}}>
-                        <Box sx={{ gap: "40px" }} display={"flex"} flexDirection={"column"} alignItems={"start"}>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Tea Light Candle</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>White</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>100gm</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>20</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>50</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>200</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Get extra 31% off (price inclusive of cashback/coupon)</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>180</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Enhance your space with this high-quality candle, designed to create a warm and soothing ambiance. Made from premium wax, it offers a clean and smokeless burn, making it ideal for home décor, relaxation, and special occasions.</Typography>
+
+                    {/* Product Details */}
+                    <Box sx={{ flex: 1 }}>
+                        <Typography variant="h4" sx={{ fontSize: "24px", fontWeight: "600", mb: 2 }}>
+                            {product.productName}
+                        </Typography>
+
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="body1" sx={{ fontSize: "16px", color: "text.secondary" }}>
+                                {product.productDescription}
+                            </Typography>
                         </Box>
-                        <Button sx={{background:"#9B70D3",color:"white",  borderRadius: "15px"}}>
-                            update
-                        </Button>
+
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 3 }}>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: "600" }}>Category:</Typography>
+                                <Typography variant="body1">{product.category}</Typography>
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: "600" }}>Weight:</Typography>
+                                <Typography variant="body1">{product.weight} gm</Typography>
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: "600" }}>Stock Available:</Typography>
+                                <Typography variant="body1">{product.stockavailable}</Typography>
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: "600" }}>Price:</Typography>
+                                <Typography variant="body1">₹{product.price}</Typography>
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: "600" }}>Special Offer:</Typography>
+                                <Typography variant="body1">{product.specialOffer ? "Yes" : "No"}</Typography>
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: "600" }}>Discount Price:</Typography>
+                                <Typography variant="body1">{product.discountPrice}%</Typography>
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ mt: 4 }}>
+                            <Button 
+                                variant="contained" 
+                                color="secondary" 
+                                sx={{ mr: 2 }}
+                                onClick={() => navigate(`/bussiness/editproduct/${product._id}`)}
+                            >
+                                Edit Product
+                            </Button>
+                            <Button 
+                                variant="outlined" 
+                                color="secondary"
+                                onClick={() => navigate('/bussiness/home')}
+                            >
+                                Back to Products
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
             </Box>
@@ -481,4 +546,4 @@ const CustomerProductView = () => {
     )
 }
 
-export default CustomerProductView
+export default BusinessViewProduct;

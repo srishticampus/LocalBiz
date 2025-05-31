@@ -16,7 +16,7 @@ const BussinessAddProduct = () => {
     useEffect(()=>{
         const bussinessdetails=localStorage.getItem("bussinessDetails");
         setBussinessdetails(JSON.parse(bussinessdetails));
-    })
+    }, [])
 
     const [photoPreview, setPhotoPreview] = useState(null);
 
@@ -34,6 +34,7 @@ const BussinessAddProduct = () => {
         category: "",
         photo: null,
     });
+    
     const handleDataChange = (e) => {
         const { name, value } = e.target;
         setError((prevError) => ({
@@ -44,11 +45,9 @@ const BussinessAddProduct = () => {
         setData(prev => {
             return { ...prev, [name]: value }
         })
-
     }
 
     const handlePhotoUpload = (e) => {
-
         setError((prevError) => {
             return { ...prevError, photo: "" }
         })
@@ -60,73 +59,78 @@ const BussinessAddProduct = () => {
             const objectURL = URL.createObjectURL(file);
             setPhotoPreview(objectURL);
         }
-
     }
+    
     const validation = () => {
         let isValid = true;
         let errorMessage = {};
+        
         if (!data.productName.trim()) {
-            errorMessage.productName = "productname should not be empty"
+            errorMessage.productName = "Product name should not be empty"
             isValid = false;
         }
         else if (data.productName.length < 3 || data.productName.length > 20) {
-            errorMessage.productName = "productname should be 3 to 20 char length"
+            errorMessage.productName = "Product name should be 3 to 20 char length"
             isValid = false;
-
         }
+        
         if (!data.productDescription.trim()) {
-            errorMessage.productDescription = "product description should not be empty";
+            errorMessage.productDescription = "Product description should not be empty";
             isValid = false;
         }
 
         if (!data.weight) {
-            errorMessage.weight = "weight should not be empty";
+            errorMessage.weight = "Weight should not be empty";
             isValid = false;
         }
 
         if (!data.adds.trim()) {
-            errorMessage.adds = "adds should not be empty";
+            errorMessage.adds = "Adds should not be empty";
             isValid = false;
         }
 
         if (!data.price) {
-            errorMessage.price = "price should not be empty"
+            errorMessage.price = "Price should not be empty"
             isValid = false;
         }
+        
         if (!data.stockavailable) {
-            errorMessage.stockavailable = "stock available should not be empty"
+            errorMessage.stockavailable = "Stock available should not be empty"
             isValid = false;
         }
 
         if (!data.discountPrice) {
-            errorMessage.discountPrice = "discount price should not be empty"
+            errorMessage.discountPrice = "Discount price should not be empty"
             isValid = false;
         }
+        
         if (!data.specialOffer.trim()) {
-            errorMessage.specialOffer = "special offer should not be empty"
+            errorMessage.specialOffer = "Special offer should not be empty"
             isValid = false;
         }
+        
         if (!data.category.trim()) {
-            errorMessage.category = "category should not be empty"
+            errorMessage.category = "Category should not be empty"
             isValid = false;
         }
+        
         if (!data.photo) {
-            errorMessage.photo = "photo should not be empty"
+            errorMessage.photo = "Photo should not be empty"
             isValid = false;
         }
+        
         setError(errorMessage);
         return isValid;
-
     }
 
-
     const handleSubmit = async (e) => {
+        e.preventDefault();
+        
         const isValid = validation();
         if (!isValid) {
             return;
         }
-        e.preventDefault();
-        // console.log(data)
+        
         const formData = new FormData();
         formData.append('productName', data.productName);
         formData.append('productDescription', data.productDescription);
@@ -138,45 +142,42 @@ const BussinessAddProduct = () => {
         formData.append('specialOffer', data.specialOffer);
         formData.append('category', data.category);
         formData.append('photo', data.photo);
-        console.log(data);
-        console.log(formData);
-        const token=localStorage.getItem("token")
+        
+        const token = localStorage.getItem("token");
 
-
-        const response = await axios.post(`${baseUrl}bussiness/addproduct`, formData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data"
-            }
-          });
-
-        const result = response.data;
-        console.log(result);
-        console.log(result.message);
-
-
-        console.log(data);
-
-        if (result.message === "bussiness Product added successfully") {
-            setData({
-                productName: "",
-                productDescription: "",
-                weight: "",
-                adds: "",
-                price: "",
-                stockavailable: "",
-                discountPrice: "",
-                specialOffer: "",
-                category: "",
-                photo: null,
+        try {
+            const response = await axios.post('http://localhost:4056/bussiness/addproduct', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
             });
-            setPhotoPreview(null);
-            toast.success("Product added successfully");
-          
+
+            const result = response.data;
+            console.log(result);
+
+            if (result.message === "bussiness Product added successfully") {
+                setData({
+                    productName: "",
+                    productDescription: "",
+                    weight: "",
+                    adds: "",
+                    price: "",
+                    stockavailable: "",
+                    discountPrice: "",
+                    specialOffer: "",
+                    category: "",
+                    photo: null,
+                });
+                setPhotoPreview(null);
+                toast.success("Product added successfully");
+            }
+        } catch (error) {
+            console.error("Error adding product:", error);
+            toast.error(error.response?.data?.message || "Failed to add product");
         }
-
-
     }
+    
     return (
         <>
             <BussinessNavbar bussinessdetails={bussinessdetails} />
@@ -196,7 +197,6 @@ const BussinessAddProduct = () => {
                                     name='productName'
                                     value={data.productName}
                                     type='text'
-
                                 />
                                 {error.productName && <span style={{ color: 'red', fontSize: '12px' }}>{error.productName}</span>}
                             </div>
@@ -207,7 +207,6 @@ const BussinessAddProduct = () => {
                                     onChange={handleDataChange}
                                     name='productDescription'
                                     value={data.productDescription}
-
                                 />
                                 {error.productDescription && <span style={{ color: 'red', fontSize: '12px' }}>{error.productDescription}</span>}
                             </div>
@@ -230,8 +229,6 @@ const BussinessAddProduct = () => {
                                     id="photo"
                                     accept="image/*"
                                     onChange={handlePhotoUpload}
-                                
-
                                 />
                                 <label htmlFor="photo" style={{ cursor: "pointer", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "15px" }}>
                                     {!photoPreview ? (<Box component="img" src={uploadphoto} alt='photo' sx={{ width: "150px", height: "40px" }}></Box>) : (<Typography color='secondary' variant='p'>photo selected</Typography>)}
@@ -259,13 +256,10 @@ const BussinessAddProduct = () => {
                                     value={data.price}
                                     type='number'
                                 />
-
                                 {error.price && <span style={{ color: 'red', fontSize: '12px' }}>{error.price}</span>}
                             </div>
-
                         </Stack>
                         <Stack direction="row" sx={{ display: "flex", gap: "25px" }}>
-
                             <div style={textFieldStyle}>
                                 <label>Stock Available</label>
                                 <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
@@ -273,11 +267,9 @@ const BussinessAddProduct = () => {
                                     name='stockavailable'
                                     value={data.stockavailable}
                                     type='number'
-
                                 />
                                 {error.stockavailable && <span style={{ color: 'red', fontSize: '12px' }}>{error.stockavailable}</span>}
                             </div>
-
                             <div style={textFieldStyle}>
                                 <label>Discount price</label>
                                 <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
@@ -285,13 +277,11 @@ const BussinessAddProduct = () => {
                                     name='discountPrice'
                                     value={data.discountPrice}
                                     type='number'
-
                                 />
                                 {error.discountPrice && <span style={{ color: 'red', fontSize: '12px' }}>{error.discountPrice}</span>}
                             </div>
                         </Stack>
                         <Stack direction="row" sx={{ display: "flex", gap: "25px" }}>
-
                             <div style={textFieldStyle}>
                                 <label>Special Offer</label>
                                 <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
@@ -299,7 +289,6 @@ const BussinessAddProduct = () => {
                                     name='specialOffer'
                                     value={data.specialOffer}
                                     type='text'
-
                                 />
                                 {error.specialOffer && <span style={{ color: 'red', fontSize: '12px' }}>{error.specialOffer}</span>}
                             </div>
@@ -311,26 +300,18 @@ const BussinessAddProduct = () => {
                                     value={data.category}
                                     type='text'
                                 />
-
                                 {error.category && <span style={{ color: 'red', fontSize: '12px' }}>{error.category}</span>}
-
                             </div>
                         </Stack>
                     </Box>
-                    {/*  */}
                     <Box display={'flex'} alignItems={'center'} justifyContent={'center'} flexDirection={'column'} sx={{ width: '253px', height: "93px", gap: '10px', mt: "100px" }}>
                         <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px", height: "40px", width: '200px', padding: '10px 35px' }}
                             onClick={handleSubmit}
                         >Add</Button>
-
-
                     </Box>
                 </Box>
             </Container>
             <Footer />
-
-
-
         </>
     )
 }

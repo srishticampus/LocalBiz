@@ -21,13 +21,44 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const pages = [
     { label: 'Home', path: '/organiser/home' },
-    { label: 'About', path: '#' },
-    { label: 'Contact', path: '#' }
+    { label: 'Requests', path: '/organiser/bussinessrequest' },  
+    { 
+        label: 'Activities', 
+        path: '#',
+        submenu: [
+            { 
+                label: 'Events', 
+                submenu: [
+                    { label: 'Add Events', path: '/organiser/add-events' },
+                    { label: 'View Events', path: '/organiser/view-events' }
+                ]
+            },
+            { 
+                label: 'Trainings', 
+                submenu: [
+                    { label: 'Add Trainings', path: '/organiser/add-trainings' },
+                    { label: 'View Trainings', path: '/organiser/view-trainings' }
+                ]
+            },
+            { 
+                label: 'Workshops', 
+                submenu: [
+                    { label: 'Add Workshops', path: '/organiser/add-workshops' },
+                    { label: 'View Workshops', path: '/organiser/view-workshops' }
+                ]
+            }
+        ]
+    },        
+    { label: 'About', path: '/organiser/AboutUs' },
+    { label: 'Contact', path: '/organiser/Contact' }
 ];
 
 const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [activitiesAnchorEl, setActivitiesAnchorEl] = React.useState(null);
+    const [subMenuAnchorEl, setSubMenuAnchorEl] = React.useState(null);
+    const [currentSubMenu, setCurrentSubMenu] = React.useState(null);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -44,10 +75,28 @@ const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
         setAnchorElUser(null);
     };
 
+    const handleActivitiesMenuOpen = (event) => {
+        setActivitiesAnchorEl(event.currentTarget);
+    };
+
+    const handleActivitiesMenuClose = () => {
+        setActivitiesAnchorEl(null);
+    };
+
+    const handleSubMenuOpen = (event, subMenuItems) => {
+        setCurrentSubMenu(subMenuItems);
+        setSubMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleSubMenuClose = () => {
+        setSubMenuAnchorEl(null);
+    };
+
     const location = useLocation();
-  return (
-    <>
-      <AppBar position="static" sx={{ backgroundColor: 'transparent',boxShadow:"none"}}>
+
+    return (
+        <>
+            <AppBar position="static" sx={{ backgroundColor: 'transparent',boxShadow:"none"}}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters
                         sx={{
@@ -64,26 +113,8 @@ const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
                             <Link to="/customer/home">
                                 <Box component="img" src={Logo} alt='logo'
                                     sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}>
-
                                 </Box>
                             </Link>
-                            
-                        </Box>
-
-                        <Box sx={{ml:"100px"}}> 
-                        <TextField
-      variant="outlined"
-      placeholder="Search..."
-      size="small"
-      sx={{ width: 300 }}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon color="action" />
-          </InputAdornment>
-        ),
-      }}
-    />
                         </Box>
 
                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -114,13 +145,53 @@ const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
                                 sx={{ display: { xs: 'block', md: 'none' } }}
                             >
                                 {pages.map((page) => (
-                                    <MenuItem key={page.label}
-                                        to={page.path}
-                                        onClick={handleCloseNavMenu}>
-                                        <Typography color='primary'
-                                            sx={{ textAlign: 'center', color: '#1967D2' }}>
-                                            {page.label}
-                                        </Typography>
+                                    <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                                        {page.submenu ? (
+                                            <>
+                                                <Typography color='primary' onClick={handleActivitiesMenuOpen}>
+                                                    {page.label}
+                                                </Typography>
+                                                <Menu
+                                                    anchorEl={activitiesAnchorEl}
+                                                    open={Boolean(activitiesAnchorEl)}
+                                                    onClose={handleActivitiesMenuClose}
+                                                >
+                                                    {page.submenu.map((item) => (
+                                                        <MenuItem 
+                                                            key={item.label}
+                                                            onMouseEnter={(e) => handleSubMenuOpen(e, item.submenu)}
+                                                        >
+                                                            {item.label}
+                                                            <ArrowRightAltIcon />
+                                                        </MenuItem>
+                                                    ))}
+                                                </Menu>
+                                                <Menu
+                                                    anchorEl={subMenuAnchorEl}
+                                                    open={Boolean(subMenuAnchorEl)}
+                                                    onClose={handleSubMenuClose}
+                                                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                                    transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                                                >
+                                                    {currentSubMenu?.map((subItem) => (
+                                                        <MenuItem 
+                                                            key={subItem.label} 
+                                                            component={Link} 
+                                                            to={subItem.path}
+                                                            onClick={handleSubMenuClose}
+                                                        >
+                                                            {subItem.label}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Menu>
+                                            </>
+                                        ) : (
+                                            <Link to={page.path} style={{ textDecoration: 'none' }}>
+                                                <Typography color='primary' sx={{ color: '#1967D2' }}>
+                                                    {page.label}
+                                                </Typography>
+                                            </Link>
+                                        )}
                                     </MenuItem>
                                 ))}
                             </Menu>
@@ -131,24 +202,87 @@ const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
                         
                         <Box sx={{ml:"200px", flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', gap: "40px" }}>
                             {pages.map((page) => (
-                                <Link style={{ textDecoration: "none" }}
-                                    key={page.label}
-                                    onClick={handleCloseNavMenu}
-                                    to={page.path}
-
-                                >
-                                    <Typography color='primary'sx={{
-                                        my: 2, fontSize: "14px", fontWeight: "500", color: location.pathname === page.path ? "#6F32BF" : "none", display: 'block', textTransform: "inherit", '&:hover': {
-                                            // borderBottom: "1px solid #1967D2",
-                                            color: '#1967D2'
-                                        }
-                                    }}> {page.label}</Typography>
-
-                                </Link>
+                                page.submenu ? (
+                                    <Box key={page.label}>
+                                        <Typography 
+                                            color='primary'
+                                            onClick={handleActivitiesMenuOpen}
+                                            sx={{
+                                                my: 2, 
+                                                fontSize: "14px", 
+                                                fontWeight: "500", 
+                                                cursor: 'pointer',
+                                                color: location.pathname.startsWith('/organiser/activities') ? "#6F32BF" : "inherit", 
+                                                display: 'block', 
+                                                textTransform: "inherit", 
+                                                '&:hover': {
+                                                    color: '#1967D2'
+                                                }
+                                            }}
+                                        >
+                                            {page.label}
+                                        </Typography>
+                                        <Menu
+                                            anchorEl={activitiesAnchorEl}
+                                            open={Boolean(activitiesAnchorEl)}
+                                            onClose={handleActivitiesMenuClose}
+                                        >
+                                            {page.submenu.map((item) => (
+                                                <MenuItem 
+                                                    key={item.label}
+                                                    onMouseEnter={(e) => handleSubMenuOpen(e, item.submenu)}
+                                                >
+                                                    {item.label}
+                                                    <ArrowRightAltIcon />
+                                                </MenuItem>
+                                            ))}
+                                        </Menu>
+                                        <Menu
+                                            anchorEl={subMenuAnchorEl}
+                                            open={Boolean(subMenuAnchorEl)}
+                                            onClose={handleSubMenuClose}
+                                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                                        >
+                                            {currentSubMenu?.map((subItem) => (
+                                                <MenuItem 
+                                                    key={subItem.label} 
+                                                    component={Link} 
+                                                    to={subItem.path}
+                                                    onClick={() => {
+                                                        handleSubMenuClose();
+                                                        handleActivitiesMenuClose();
+                                                    }}
+                                                >
+                                                    {subItem.label}
+                                                </MenuItem>
+                                            ))}
+                                        </Menu>
+                                    </Box>
+                                ) : (
+                                    <Link style={{ textDecoration: "none" }}
+                                        key={page.label}
+                                        to={page.path}
+                                    >
+                                        <Typography color='primary'sx={{
+                                            my: 2, 
+                                            fontSize: "14px", 
+                                            fontWeight: "500", 
+                                            color: location.pathname === page.path ? "#6F32BF" : "inherit", 
+                                            display: 'block', 
+                                            textTransform: "inherit", 
+                                            '&:hover': {
+                                                color: '#1967D2'
+                                            }
+                                        }}> 
+                                            {page.label}
+                                        </Typography>
+                                    </Link>
+                                )
                             ))}
                         </Box>
                         <Box display={"flex"} justifyContent={"space-around"} alignItems={"center"} sx={{ mr:"100px",flexGrow: 0, gap: "50px" }}>
-                        <SmsOutlinedIcon color='primary' sx={{ height: '24px' }} />
+                            <SmsOutlinedIcon color='primary' sx={{ height: '24px' }} />
                             <NotificationsOutlinedIcon color='primary' sx={{ height: '24px' }} />
                             
                             <Box display={"flex"} justifyContent={"center"} alignItems={"center"} sx={{ gap: "30px" }}>
@@ -159,16 +293,13 @@ const OrganiserNavbar = ({organiserdetails={},onAvatarClick}) => {
                                 ) : (
                                     <Avatar onClick={onAvatarClick} >{organiserdetails?.name?.charAt(0)}</Avatar>
                                 )}
-
-
                             </Box>
                         </Box>
                     </Toolbar>
                 </Container>
             </AppBar>
-        
-    </>
-  )
+        </>
+    )
 }
 
 export default OrganiserNavbar
