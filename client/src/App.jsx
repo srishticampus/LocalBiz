@@ -1,4 +1,4 @@
-import { useState } from 'react'
+
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import CustomerRegistration from "./components/customer/CustomerRegistration"
@@ -43,6 +43,18 @@ import OrganiserAboutUs from './components/organiser/OrganiserAboutUs';
 import OrganiserContact from './components/organiser/OrganiserContact';
 import CustomerBusinessView from './components/customer/CustomerBussinessView';
 import OrganiserAddEvents from './components/organiser/OrganiserAddEvents';
+import AddTrainning from './components/organiser/AddTrainning';
+import AddWorkshopsForm from './components/organiser/AddWorkshopsForm';
+import EditEvents from './components/organiser/EditEvents';
+import EditTrainning from './components/organiser/EditTrainning';
+import EditWorkShop from './components/organiser/EditWorkShop';
+import OrganiserViewEvents from './components/organiser/OrganiserViewEvents';
+import RequestPage from './components/organiser/RequestPage';
+import ViewTrainingsTable from './components/organiser/ViewTrainingsTable';
+import ViewWorkshopsTable from './components/organiser/ViewWorkshopsTable';
+import CommunityJoinForm from './components/bussiness/CommunityJoinForm';
+import BusinessEvents from './components/bussiness/BusinessEvents';
+import ViewTrainning from './components/bussiness/ViewTrainning'; // Corrected import
 
 
 function App() {
@@ -78,7 +90,7 @@ function App() {
           <Route path='/admin/viewusers' element={<AdminViewUsers />} />
           <Route path='/admin/bussinessowners' element={<AdminViewBusinessOwners />} />
           <Route path='/admin/organizations' element={<AdminViewOrganizations />} />
-          
+
 
           {/* customers */}
           <Route path='/customer/registration' element={<CustomerRegistration />} />
@@ -87,12 +99,13 @@ function App() {
           <Route path='/customer/resetpassword/:email' element={<CustomerResetPassword />} />
           <Route path='/customer/home' element={<CustomerHome />} />
           <Route path='/customer/viewproduct' element={<CustomerProductView />} />
+          <Route path='/customer/productview/:id' element={<CustomerProductView />} />
           <Route path='/customer/profile' element={<CustomerProfile />} />
           <Route path='/customer/msg/compaint' element={<MsgComplaint />} />
           <Route path='/customer/Viewcompaints' element={<CustomerComplaints />} />
           <Route path='/customer/AboutUs' element={<CustomerAboutUs />} />
           <Route path='/customer/Contact' element={<CustomerContact />} />
-          <Route path='/customer/bussinessview/:id' element={<CustomerBusinessView/>}/>
+          <Route path='/customer/bussinessview' element={<CustomerBusinessView />} />
 
 
 
@@ -104,7 +117,10 @@ function App() {
           <Route path='/bussiness/home' element={<BussinessHome />} />
           <Route path='/bussiness/addproduct' element={<BussinessAddProduct />} />
           <Route path='/bussiness/editproduct/:id' element={<BussinessEditProducts />} />
-          <Route path='/bussiness/ViewProduct/:id' element={<BusinessViewProduct />} />
+          <Route path='/bussiness/ViewProduct/:productId' element={<BusinessViewProduct />} />
+          <Route path='/bussiness/Community' element={<CommunityJoinForm />} />
+          <Route path='/bussiness/ViewEvents' element={<BusinessEvents />} />
+          <Route path='/bussiness/ViewTrainning' element={<ViewTrainning />} />
 
           {/* organiser */}
           <Route path='/organiser/registration' element={<OrganiserRegister />} />
@@ -112,11 +128,19 @@ function App() {
           <Route path='/organiser/forgotpassword' element={<OrganiserForgotPassword />} />
           <Route path='/organiser/resetpassword/:email' element={<OrganiserResetPassword />} />
           <Route path='/organiser/home' element={<OrganiserHome />} />
-          <Route path='/organiser/bussinessrequest' element={<OrganizerBussinessRequest/>}/>
+          <Route path='/organiser/bussinessrequest' element={<OrganizerBussinessRequest />} />
           <Route path='/organiser/AboutUs' element={<OrganiserAboutUs />} />
           <Route path='/organiser/Contact' element={<OrganiserContact />} />
           <Route path='/organiser/addevents' element={<OrganiserAddEvents />} />
-          
+          <Route path='/organiser/Viewevents' element={<OrganiserViewEvents />} />
+          <Route path='/organiser/AddTrainning' element={<AddTrainning />} />
+          <Route path='/organiser/ViewTrainning' element={<ViewTrainingsTable />} />
+          <Route path='/organiser/AddWorkShop' element={<AddWorkshopsForm />} />
+          <Route path='/organiser/ViewWorkShop' element={<ViewWorkshopsTable />} />
+          <Route path='/organiser/EditEvents/:id' element={<EditEvents />} />
+          <Route path='/organiser/EditTrainning' element={<EditTrainning />} />
+          <Route path='/organiser/EditWorkShop' element={<EditWorkShop />} />
+
 
         </Routes>
       </ThemeProvider>

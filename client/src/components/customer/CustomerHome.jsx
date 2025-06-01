@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import CustomerNavbar from '../Navbar/CustomerNavbar'
-import { Avatar, Box, Breadcrumbs, Card, Grid, Button, Container, Fade, Modal, Stack, Typography } from '@mui/material'
-import coin from "../../assets/image 94.png";
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt'
+import React, { useEffect, useState } from 'react';
+import CustomerNavbar from '../Navbar/CustomerNavbar';
+import { Avatar, Box, Breadcrumbs, Card, Grid, Button, Container, Fade, Modal, Stack, Typography } from '@mui/material';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import Footer from '../Footer/Footer';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import axiosInstance from '../../api/axiosInstance';
 import CloseIcon from '@mui/icons-material/Close';
 import Backdrop from '@mui/material/Backdrop';
 import { toast } from 'react-toastify';
@@ -15,7 +14,6 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-import { baseUrl } from '../../baseUrl';
 import { Link } from 'react-router-dom';
 
 const CustomerHome = () => {
@@ -31,98 +29,47 @@ const CustomerHome = () => {
         p: 4,
     };
 
-    // Dummy product data
-    const products = [
-        {
-            id: 1,
-            name: "Candles",
-            stock: 10,
-            offer: "Special Offer",
-            discount: "20%",
-            price: 200,
-            image: coin
-        },
-        {
-            id: 2,
-            name: "Incense Sticks",
-            stock: 15,
-            offer: "Limited Offer",
-            discount: "15%",
-            price: 150,
-            image: coin
-        },
-        {
-            id: 3,
-            name: "Essential Oils",
-            stock: 8,
-            offer: "New Arrival",
-            discount: "10%",
-            price: 350,
-            image: coin
-        },
-        {
-            id: 4,
-            name: "Meditation Cushion",
-            stock: 5,
-            offer: "Combo Offer",
-            discount: "25%",
-            price: 500,
-            image: coin
-        },
-        {
-            id: 5,
-            name: "Yoga Mat",
-            stock: 12,
-            offer: "Seasonal Offer",
-            discount: "30%",
-            price: 800,
-            image: coin
-        },
-        {
-            id: 6,
-            name: "Prayer Beads",
-            stock: 20,
-            offer: "Clearance Sale",
-            discount: "40%",
-            price: 250,
-            image: coin
-        },
-        {
-            id: 7,
-            name: "Aroma Diffuser",
-            stock: 7,
-            offer: "Flash Sale",
-            discount: "20%",
-            price: 650,
-            image: coin
-        },
-        {
-            id: 8,
-            name: "Spiritual Books",
-            stock: 25,
-            offer: "Buy 1 Get 1",
-            discount: "50%",
-            price: 300,
-            image: coin
-        }
-    ];
-
     const [customer, setCustomer] = useState({});
+    const [products, setProducts] = useState([]);
+
     const fetchUser = async () => {
         const token = localStorage.getItem('token');
-        const decoded = jwtDecode(token);
-        const customer = await axios.get(`${baseUrl}customer/getcustomer/${decoded.id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        const customerDatas = localStorage.setItem("customerDetails",
-            JSON.stringify(customer.data.customer));
-        setCustomer(customer.data.customer);
-    }
+        if (!token) {
+            navigate("/customer/login");
+            return;
+        }
+        try {
+            const decoded = jwtDecode(token);
+            const customerResponse = await axiosInstance.get(`customer/getcustomer/${decoded.id}`);
+            localStorage.setItem("customerDetails", JSON.stringify(customerResponse.data.customer));
+            setCustomer(customerResponse.data.customer);
+        } catch (error) {
+            console.error("Error fetching customer data:", error);
+            toast.error("Failed to fetch customer data.");
+            localStorage.removeItem('token');
+            localStorage.removeItem('customerDetails');
+            navigate('/customer/login');
+        }
+    };
+
+    const fetchProducts = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate("/customer/login");
+            return;
+        }
+        try {
+            const productsResponse = await axiosInstance.get(`bussiness/viewproduct`);
+            setProducts(productsResponse.data.data || []); // Ensure products is an array
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            toast.error("Failed to fetch products.");
+        }
+    };
 
     useEffect(() => {
         fetchUser();
+        fetchProducts();
     }, []);
 
     const navigate = useNavigate();
@@ -135,7 +82,7 @@ const CustomerHome = () => {
         localStorage.removeItem('customerDetails');
         navigate('/customer/login');
         toast.success("you logged out");
-    }
+    };
 
     // for profile 
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" };
@@ -159,7 +106,7 @@ const CustomerHome = () => {
         phone: "",
         profilePic: null
     });
-    const [error, setError] = useState({})
+    const [error, setError] = useState({});
     const handleDataChange = (e) => {
         setError((prevError) => ({
             ...prevError,
@@ -167,8 +114,8 @@ const CustomerHome = () => {
         }));
         const { name, value } = e.target;
         setData(prev => {
-            return { ...prev, [name]: value }
-        })
+            return { ...prev, [name]: value };
+        });
     };
 
     const [imagePreview, setImagePreview] = useState(null);
@@ -177,7 +124,7 @@ const CustomerHome = () => {
         const file = e.target.files[0];
         if (file) {
             setData(prev => {
-                return { ...prev, profilePic: file }
+                return { ...prev, profilePic: file };
             });
             const objectURL = URL.createObjectURL(file);
             setImagePreview(objectURL);
@@ -189,11 +136,11 @@ const CustomerHome = () => {
         let errorMessage = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!data.name.trim()) {
-            errorMessage.name = "Name should not be empty"
+            errorMessage.name = "Name should not be empty";
             isValid = false;
         }
         else if (data.name.length < 3 || data.name.length > 20) {
-            errorMessage.name = "Name should be 3 to 20 char length"
+            errorMessage.name = "Name should be 3 to 20 char length";
             isValid = false;
         }
         if (!data.email.trim()) {
@@ -206,15 +153,15 @@ const CustomerHome = () => {
         }
 
         if (data.address.length < 10) {
-            errorMessage.address = "Address should be 10 char length"
+            errorMessage.address = "Address should be 10 char length";
             isValid = false;
         }
         else if (!data.address.trim()) {
-            errorMessage.address = "Address should not be empty"
+            errorMessage.address = "Address should not be empty";
             isValid = false;
         }
         if (!data.phone) {
-            errorMessage.phone = "Phone should not be empty"
+            errorMessage.phone = "Phone should not be empty";
             isValid = false;
         }
         else if (!/^\d{10}$/.test(data.phone)) {
@@ -239,22 +186,17 @@ const CustomerHome = () => {
         formData.append('phone', data.phone);
         formData.append('profilePic', data.profilePic);
 
-        const token = localStorage.getItem("token");
-        const updated = await axios.post(`${baseUrl}customer/editcustomer/${customer._id}`, formData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const updated = await axiosInstance.post(`customer/editcustomer/${customer._id}`, formData);
 
         if (updated.data.message === "Customer updated successfully.") {
-            toast.success("Customer updated successfully.")
+            toast.success("Customer updated successfully.");
             setEditOpen(false);
             fetchUser();
         }
         else {
-            toast.error("Error in updating Customer profile")
+            toast.error("Error in updating Customer profile");
         }
-    }
+    };
 
     const [editOpen, setEditOpen] = React.useState(false);
     const handleEditOpen = () => {
@@ -269,7 +211,7 @@ const CustomerHome = () => {
             ? `http://localhost:4056/uploads/${customer?.profilePic?.filename}`
             : null);
         setEditOpen(true);
-    }
+    };
     const handleEditClose = () => setEditOpen(false);
 
     const [showProfileCard, setShowProfileCard] = useState(false);
@@ -309,26 +251,26 @@ const CustomerHome = () => {
                     </Box>
                 </ClickAwayListener>
             )}
-            
+
             {/* Products Section with 2 products per row and increased size */}
-            <Box sx={{ 
+            <Box sx={{
                 padding: '40px 75px',
                 backgroundColor: '#f9f9f9',
                 minHeight: 'calc(100vh - 180px)'
             }}>
-                <Typography variant='h4' sx={{ 
-                    fontSize: "28px", 
-                    fontWeight: "600", 
-                    color: "text.primary", 
+                <Typography variant='h4' sx={{
+                    fontSize: "28px",
+                    fontWeight: "600",
+                    color: "text.primary",
                     mb: "40px",
                     textAlign: 'center'
                 }}>
                     Our Products
                 </Typography>
-                
+
                 <Grid container spacing={4} justifyContent="center">
                     {products.map((product) => (
-                        <Grid item xs={12} md={6} key={product.id} sx={{
+                        <Grid item xs={12} md={6} key={product._id} sx={{
                             display: 'flex',
                             justifyContent: 'center'
                         }}>
@@ -357,17 +299,17 @@ const CustomerHome = () => {
                                     justifyContent: 'center',
                                     backgroundColor: '#f5f5f5'
                                 }}>
-                                    <img 
-                                        src={product.image} 
-                                        alt={product.name} 
+                                    <img
+                                        src={`http://localhost:4056/uploads/${product?.photo?.filename}`}
+                                        alt={product.productName}
                                         style={{
                                             height: '100%',
                                             width: 'auto',
                                             objectFit: 'contain'
-                                        }} 
+                                        }}
                                     />
                                 </Box>
-                                
+
                                 {/* Product Details Section */}
                                 <Box sx={{
                                     padding: '20px',
@@ -377,67 +319,67 @@ const CustomerHome = () => {
                                     justifyContent: 'space-between'
                                 }}>
                                     <Box>
-                                        <Typography variant='h5' sx={{ 
-                                            fontSize: '22px', 
+                                        <Typography variant='h5' sx={{
+                                            fontSize: '22px',
                                             fontWeight: 600,
                                             marginBottom: '10px'
                                         }}>
-                                            {product.name}
+                                            {product.productName}
                                         </Typography>
-                                        
-                                        <Box sx={{ 
+
+                                        <Box sx={{
                                             display: 'grid',
                                             gridTemplateColumns: 'repeat(2, 1fr)',
                                             gap: '15px',
                                             marginBottom: '20px'
                                         }}>
                                             <Box>
-                                                <Typography variant='body2' sx={{ 
+                                                <Typography variant='body2' sx={{
                                                     color: 'text.secondary',
                                                     fontSize: '14px'
                                                 }}>
                                                     Stock Available
                                                 </Typography>
                                                 <Typography variant='body1' sx={{ fontWeight: 500 }}>
-                                                    {product.stock} units
+                                                    {product.stockavailable} units
                                                 </Typography>
                                             </Box>
-                                            
+
                                             <Box>
-                                                <Typography variant='body2' sx={{ 
+                                                <Typography variant='body2' sx={{
                                                     color: 'text.secondary',
                                                     fontSize: '14px'
                                                 }}>
                                                     Special Offer
                                                 </Typography>
                                                 <Typography variant='body1' sx={{ fontWeight: 500 }}>
-                                                    {product.offer}
+                                                    {product.specialOffer}
                                                 </Typography>
                                             </Box>
-                                            
+
                                             <Box>
-                                                <Typography variant='body2' sx={{ 
+                                                <Typography variant='body2' sx={{
                                                     color: 'text.secondary',
                                                     fontSize: '14px'
                                                 }}>
                                                     Discount
                                                 </Typography>
-                                                <Typography variant='body1' sx={{ 
+                                                <Typography variant='body1' sx={{
                                                     color: 'success.main',
                                                     fontWeight: 600
                                                 }}>
-                                                    {product.discount} OFF
+                                                    {product.discountPrice}% OFF
                                                 </Typography>
                                             </Box>
-                                            
+
                                             <Box>
-                                                <Typography variant='body2' sx={{ 
+                                                <Typography variant='body2' sx={{
                                                     color: 'text.secondary',
                                                     fontSize: '14px'
                                                 }}>
                                                     Price
                                                 </Typography>
-                                                <Typography variant='body1' sx={{ 
+                                                <Typography variant='body1' sx={{
                                                     fontWeight: 700,
                                                     fontSize: '18px'
                                                 }}>
@@ -446,16 +388,16 @@ const CustomerHome = () => {
                                             </Box>
                                         </Box>
                                     </Box>
-                                    
-                                    <Box sx={{ 
+
+                                    <Box sx={{
                                         display: 'flex',
                                         justifyContent: 'flex-end'
                                     }}>
-                                        <Button 
+                                        <Button
                                             variant="contained"
                                             color='secondary'
                                             endIcon={<ArrowRightAltIcon />}
-                                            sx={{ 
+                                            sx={{
                                                 borderRadius: '8px',
                                                 padding: '10px 24px',
                                                 textTransform: 'none',
@@ -474,7 +416,7 @@ const CustomerHome = () => {
                     ))}
                 </Grid>
             </Box>
-            
+
             <Footer />
 
             {/* logout modal */}

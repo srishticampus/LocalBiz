@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from './AdminSideBar';
 import { toast } from 'react-toastify';
 import Footer from '../Footer/Footer';
+import axiosInstance from '../../api/axiosInstance';
 
 const style = {
   position: 'absolute',
@@ -22,17 +23,10 @@ const style = {
   p: 4,
 };
 
-const dummyComplaints = [
-  { id: 1, title: 'App crash on login', description: 'The application crashes every time I try to log in.' },
-  { id: 2, title: 'Missing profile picture upload', description: 'There is no option to upload profile picture on the dashboard.' },
-  { id: 3, title: 'Unable to submit form', description: 'Submission button is disabled even after filling the form.' },
-  { id: 4, title: 'Incorrect user role', description: 'I am logged in as a parent but I am shown educator content.' },
-  { id: 5, title: 'Notification bug', description: 'Notifications keep popping up even when there are no updates.' },
-];
 
 const AdminComplaints = () => {
   const [open, setOpen] = useState(false);
-  const [complaints, setComplaints] = useState(dummyComplaints);
+  const [complaints, setComplaints] = useState([]);
 
   const navigate = useNavigate();
   const handleLogOut = () => {
@@ -48,7 +42,53 @@ const AdminComplaints = () => {
     if (localStorage.getItem('token') == null) {
       navigate('/admin/login');
     }
+    fetchComplaints();
   }, [navigate]);
+
+  const fetchComplaints = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/admin/login');
+      return;
+    }
+    try {
+      const response = await axiosInstance.get('/api/admin/complaints');
+      if (response.data && response.data.data) {
+        setComplaints(response.data.data);
+      } else {
+        setComplaints([]);
+      }
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
+      toast.error("Error fetching complaints.");
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/admin/login');
+      }
+    }
+  };
+
+  const handleResolveComplaint = async (id) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/admin/login');
+      return;
+    }
+    try {
+      const response = await axiosInstance.post(`/api/admin/complaints/${id}/resolve`, {
+        status: 'resolved',
+      });
+      if (response.data.message) {
+        toast.success(response.data.message);
+        fetchComplaints(); // Refresh the list
+      } else {
+        toast.error("Failed to resolve complaint.");
+      }
+    } catch (error) {
+      console.error("Error resolving complaint:", error);
+      toast.error(error.response?.data?.message || "Error resolving complaint.");
+    }
+  };
 
   return (
     <>
@@ -72,8 +112,10 @@ const AdminComplaints = () => {
                 <thead>
                   <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '2px solid #9c27b0' }}>
                     <th style={{ padding: '12px 16px', textAlign: 'left', color: '#9c27b0', fontWeight: 600 }}>S No</th>
-                    <th style={{ padding: '12px 16px', textAlign: 'left', color: '#9c27b0', fontWeight: 600 }}>Complaint</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', color: '#9c27b0', fontWeight: 600 }}>Consumer Name</th>
                     <th style={{ padding: '12px 16px', textAlign: 'left', color: '#9c27b0', fontWeight: 600 }}>Description</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', color: '#9c27b0', fontWeight: 600 }}>Status</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', color: '#9c27b0', fontWeight: 600 }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>

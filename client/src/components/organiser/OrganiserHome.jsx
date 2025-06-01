@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,6 +12,8 @@ import {
   Avatar,
   Card,
   CardContent,
+  CircularProgress, // For loading indicator
+  Alert, // For error messages
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -23,6 +25,7 @@ import {
 import { styled, alpha } from '@mui/system';
 import OrganiserNavbar from '../Navbar/OrganiserNavbar';
 import Footer from '../Footer/Footer';
+import axiosInstance from '../../api/axiosInstance'; // Import axiosInstance
 
 // --- Styled Components ---
 
@@ -119,172 +122,133 @@ const InfoBox = styled(Box)(({ theme }) => ({
 
 function OrganiserHome() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [community, setCommunity] = useState('All'); // Default filter
+  const [selectedCommunityFilter, setSelectedCommunityFilter] = useState('All'); // Renamed to avoid conflict with fetched data
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [communities, setCommunities] = useState([]); // State to store fetched communities
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample data (replace with actual data from your API)
-  const items = [
-    {
-      id: 1,
-      name: 'John Jerin',
-      subtitle: 'Homemade Pottery',
-      category: 'Art',
-      mainImage: 'https://via.placeholder.com/60', // Replace with actual image URLs
-      icon1: 'https://via.placeholder.com/40/FFC0CB?text=Vase', // Placeholder for the vase icon
-      icon2: 'https://via.placeholder.com/40/FFB6C1?text=Logo', // Placeholder for the logo icon
-    },
-    {
-      id: 2,
-      name: 'John Jerin',
-      subtitle: 'Homemade Pottery',
-      category: 'Art',
-      mainImage: 'https://via.placeholder.com/60',
-      icon1: 'https://via.placeholder.com/40/FFC0CB?text=Vase',
-      icon2: 'https://via.placeholder.com/40/FFB6C1?text=Logo',
-    },
-    {
-      id: 3,
-      name: 'John Jerin',
-      subtitle: 'Homemade Pottery',
-      category: 'Art',
-      mainImage: 'https://via.placeholder.com/60',
-      icon1: 'https://via.placeholder.com/40/FFC0CB?text=Vase',
-      icon2: 'https://via.placeholder.com/40/FFB6C1?text=Logo',
-    },
-    {
-      id: 4,
-      name: 'John Jerin',
-      subtitle: 'Homemade Pottery',
-      category: 'Art',
-      mainImage: 'https://via.placeholder.com/60',
-      icon1: 'https://via.placeholder.com/40/FFC0CB?text=Vase',
-      icon2: 'https://via.placeholder.com/40/FFB6C1?text=Logo',
-    },
-    // The image shows a duplicate set of these 4 items, let's create a second row for variety
-    {
-      id: 5,
-      name: 'Jane Doe',
-      subtitle: 'Custom Jewelry',
-      category: 'Crafts',
-      mainImage: 'https://via.placeholder.com/60/0000FF/FFFFFF?text=JD',
-      icon1: 'https://via.placeholder.com/40/ADD8E6?text=Ring',
-      icon2: 'https://via.placeholder.com/40/87CEEB?text=Brand',
-    },
-    {
-      id: 6,
-      name: 'Jane Doe',
-      subtitle: 'Custom Jewelry',
-      category: 'Crafts',
-      mainImage: 'https://via.placeholder.com/60/0000FF/FFFFFF?text=JD',
-      icon1: 'https://via.placeholder.com/40/ADD8E6?text=Ring',
-      icon2: 'https://via.placeholder.com/40/87CEEB?text=Brand',
-    },
-    {
-      id: 7,
-      name: 'Jane Doe',
-      subtitle: 'Custom Jewelry',
-      category: 'Crafts',
-      mainImage: 'https://via.placeholder.com/60/0000FF/FFFFFF?text=JD',
-      icon1: 'https://via.placeholder.com/40/ADD8E6?text=Ring',
-      icon2: 'https://via.placeholder.com/40/87CEEB?text=Brand',
-    },
-    {
-      id: 8,
-      name: 'Jane Doe',
-      subtitle: 'Custom Jewelry',
-      category: 'Crafts',
-      mainImage: 'https://via.placeholder.com/60/0000FF/FFFFFF?text=JD',
-      icon1: 'https://via.placeholder.com/40/ADD8E6?text=Ring',
-      icon2: 'https://via.placeholder.com/40/87CEEB?text=Brand',
-    },
-  ];
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await axiosInstance.get('/api/communities');
+        // Map the fetched data to fit the existing ItemCard structure
+        const mappedCommunities = response.data.data.map(org => ({
+          id: org._id,
+          name: org.organizationName,
+          subtitle: org.organizationType, // Using organizationType as subtitle
+          category: org.organizationType, // Using organizationType as category for filtering
+          mainImage: 'https://via.placeholder.com/60', // Placeholder
+          icon1: 'https://via.placeholder.com/40', // Placeholder
+          icon2: 'https://via.placeholder.com/40', // Placeholder
+        }));
+        setCommunities(mappedCommunities);
+      } catch (err) {
+        console.error('Error fetching communities:', err);
+        setError('Failed to load communities. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Filter items based on search term and selected community
-  const filteredItems = items.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCommunity = community === 'All' || item.category === community; // Assuming 'category' maps to 'community'
+    fetchCommunities();
+  }, []);
 
-    return matchesSearch && matchesCommunity;
+  // Filter items based on search term and selected community filter
+  const filteredCommunities = communities.filter(community => {
+    const matchesSearch = community.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      community.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      community.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCommunityFilter = selectedCommunityFilter === 'All' || community.category === selectedCommunityFilter;
+
+    return matchesSearch && matchesCommunityFilter;
   });
 
   return (
     <div>
-        <OrganiserNavbar/>
-    <PageContainer>
-      {/* Header Bar: Search, Filter, View Mode */}
-      <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 4, gap: 2 }}>
-        <Search>
-          <SearchIconWrapper>
-            <SearchIcon />
-          </SearchIconWrapper>
-          <StyledInputBase
-            placeholder="Search Here"
-            inputProps={{ 'aria-label': 'search' }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </Search>
+      <OrganiserNavbar />
+      <PageContainer>
+        {/* Header Bar: Search, Filter, View Mode */}
+        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 4, gap: 2 }}>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search Here"
+              inputProps={{ 'aria-label': 'search' }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </Search>
 
-        <IconButton size="large" sx={{ backgroundColor: alpha('#000', 0.05), borderRadius: '8px' }}>
-          <TuneIcon />
-        </IconButton>
+          <IconButton size="large" sx={{ backgroundColor: alpha('#000', 0.05), borderRadius: '8px' }}>
+            <TuneIcon />
+          </IconButton>
 
-        <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-          <StyledSelect
-            value={community}
-            onChange={(e) => setCommunity(e.target.value)}
-            displayEmpty
-            inputProps={{ 'aria-label': 'Communities filter' }}
-            IconComponent={KeyboardArrowDownIcon} // Custom icon for dropdown
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
+            <StyledSelect
+              value={selectedCommunityFilter}
+              onChange={(e) => setSelectedCommunityFilter(e.target.value)}
+              displayEmpty
+              inputProps={{ 'aria-label': 'Communities filter' }}
+              IconComponent={KeyboardArrowDownIcon} // Custom icon for dropdown
+            >
+              <MenuItem value="All">Communities</MenuItem>
+              <MenuItem value="Art">Art</MenuItem>
+              <MenuItem value="Crafts">Crafts</MenuItem>
+              <MenuItem value="Tech">Tech</MenuItem>
+              <MenuItem value="Food">Food</MenuItem>
+            </StyledSelect>
+          </FormControl>
+
+          <IconButton
+            size="large"
+            sx={{ backgroundColor: alpha('#000', 0.05), borderRadius: '8px' }}
+            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
           >
-            <MenuItem value="All">Communities</MenuItem>
-            <MenuItem value="Art">Art</MenuItem>
-            <MenuItem value="Crafts">Crafts</MenuItem>
-            <MenuItem value="Tech">Tech</MenuItem>
-            <MenuItem value="Food">Food</MenuItem>
-          </StyledSelect>
-        </FormControl>
+            {viewMode === 'grid' ? <AppsIcon /> : <ViewListIcon />}
+          </IconButton>
+        </Box>
 
-        <IconButton
-          size="large"
-          sx={{ backgroundColor: alpha('#000', 0.05), borderRadius: '8px' }}
-          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-        >
-          {viewMode === 'grid' ? <AppsIcon /> : <ViewListIcon />}
-        </IconButton>
-      </Box>
-
-      {/* Items Grid */}
-      <Grid container spacing={3}>
-        {filteredItems.map((item) => (
-          <Grid item xs={12} sm={viewMode === 'grid' ? 6 : 12} md={viewMode === 'grid' ? 6 : 12} key={item.id}>
-            <ItemCard>
-              <Avatar
-                src={item.mainImage}
-                alt={item.name}
-                sx={{ width: 80, height: 80, borderRadius: '8px' }} // Square avatar/image
-                variant="square" // Make it square
-              />
-              <InfoBox>
-                <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                  {item.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {item.subtitle}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {item.category}
-                </Typography>
-              </InfoBox>
-             
-            </ItemCard>
+        {/* Items Grid */}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <Grid container spacing={3}>
+            {filteredCommunities.map((community) => (
+              <Grid item xs={12} sm={viewMode === 'grid' ? 6 : 12} md={viewMode === 'grid' ? 6 : 12} key={community.id}>
+                <ItemCard>
+                  <Avatar
+                    src={community.mainImage}
+                    alt={community.name}
+                    sx={{ width: 80, height: 80, borderRadius: '8px' }} // Square avatar/image
+                    variant="square" // Make it square
+                  />
+                  <InfoBox>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                      {community.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {community.subtitle}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {community.category}
+                    </Typography>
+                  </InfoBox>
+                </ItemCard>
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
-    </PageContainer>
-<Footer/>
+        )}
+      </PageContainer>
+      <Footer />
     </div>
   );
 }

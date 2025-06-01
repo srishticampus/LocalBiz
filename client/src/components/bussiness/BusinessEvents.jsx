@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { baseUrl } from '../../baseUrl';
 import { ClickAwayListener } from '@mui/material';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
@@ -17,41 +17,11 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import arrow from "../../assets/arrow.png";
 
 export default function BusinessEvents() {
-  const events = [
-    {
-      id: 1,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-    {
-      id: 2,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-    {
-      id: 3,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-    {
-      id: 4,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-  ];
-
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [bussiness, setBussiness] = useState(
     JSON.parse(localStorage.getItem("bussinessDetails")) || {}
   );
-  const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const [showProfileCard, setShowProfileCard] = useState(false);
 
@@ -74,6 +44,7 @@ export default function BusinessEvents() {
 
   useEffect(() => {
     fetchUser();
+    fetchEvents();
   }, []);
 
   const fetchUser = async () => {
@@ -83,14 +54,10 @@ export default function BusinessEvents() {
         navigate('/bussiness/login');
         return;
       }
-      
+
       const decoded = jwtDecode(token);
-      const response = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
+      const response = await axiosInstance.get(`/bussiness/getbussiness/${decoded.id}`);
+
       if (response.data && response.data.bussiness) {
         localStorage.setItem("bussinessDetails", JSON.stringify(response.data.bussiness));
         setBussiness(response.data.bussiness);
@@ -99,7 +66,30 @@ export default function BusinessEvents() {
       console.error("Error fetching business details:", error);
       toast.error("Error fetching business details");
     }
-  }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/bussiness/login');
+        return;
+      }
+
+      const decoded = jwtDecode(token);
+      // Assuming an API endpoint to fetch events for a business
+      const response = await axiosInstance.get(`/api/events/bussiness/${decoded.id}`);
+
+      if (response.data && response.data.events) {
+        setEvents(response.data.events);
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      toast.error("Error fetching events");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogOut = () => {
     localStorage.removeItem('token');
@@ -211,14 +201,9 @@ export default function BusinessEvents() {
       formData.append('profilePic', data.profilePic);
     }
 
-    const token = localStorage.getItem("token");
     try {
-      const updated = await axios.post(`${baseUrl}bussiness/editBussiness/${bussiness._id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
+      const updated = await axiosInstance.post(`/bussiness/editBussiness/${bussiness._id}`, formData);
+
       if (updated.data && updated.data.message === "bussiness updated successfully.") {
         toast.success("Business updated successfully.")
         setEditOpen(false);
@@ -262,17 +247,17 @@ export default function BusinessEvents() {
 
   return (
     <div>
-      <BussinessNavbar 
-        bussinessdetails={bussiness} 
-        onAvatarClick={onAvatarClick} 
+      <BussinessNavbar
+        bussinessdetails={bussiness}
+        onAvatarClick={onAvatarClick}
       />
-      
+
       {showProfileCard && (
         <ClickAwayListener onClickAway={() => setShowProfileCard(false)}>
           <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5, width: "375px" }}>
             <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
               <Avatar sx={{ height: "146px", width: "146px", position: "absolute", top: "50px", left: "100px", zIndex: 2 }}
-                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""} 
+                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""}
                 alt={bussiness?.name || "Business"}></Avatar>
               <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
                 <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }}></Box>
@@ -293,74 +278,84 @@ export default function BusinessEvents() {
       )}
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box 
-          component={Paper} 
-          elevation={3} 
-          sx={{ 
-            p: 4, 
+        <Box
+          component={Paper}
+          elevation={3}
+          sx={{
+            p: 4,
             borderRadius: 4,
             width: '100%'
           }}
         >
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{ 
-              fontWeight: 300, 
-              color: 'text.secondary', 
-              textAlign: 'center', 
-              mb: 5 
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              fontWeight: 300,
+              color: 'text.secondary',
+              textAlign: 'center',
+              mb: 5
             }}
           >
             View Events
           </Typography>
 
-          <TableContainer component={Paper} elevation={0}>
-            <Table sx={{ minWidth: 650 }} aria-label="events table">
-              <TableHead>
-                <TableRow sx={{ borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>S NO</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Event Name</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Organizer Name</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Organizer Email</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Phone Number</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {events.map((event) => (
-                  <TableRow 
-                    key={event.id} 
-                    sx={{ 
-                      '&:last-child td, &:last-child th': { border: 0 },
-                      borderBottom: '1px solid rgba(224, 224, 224, 1)'
-                    }}
-                  >
-                    <TableCell>{event.id}.</TableCell>
-                    <TableCell>{event.eventName}</TableCell>
-                    <TableCell>{event.organizerName}</TableCell>
-                    <TableCell>{event.organizerEmail}</TableCell>
-                    <TableCell>{event.phoneNumber}</TableCell>
-                    <TableCell>
-                      <Button
-                        onClick={() => handleJoin(event.id)}
-                        variant="contained"
-                        color="primary"
+          {loading ? (
+            <Typography variant="h6" sx={{ textAlign: 'center', mt: 4 }}>Loading events...</Typography>
+          ) : (
+            <TableContainer component={Paper} elevation={0}>
+              <Table sx={{ minWidth: 650 }} aria-label="events table">
+                <TableHead>
+                  <TableRow sx={{ borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>S NO</TableCell>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Event Name</TableCell>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Organizer Name</TableCell>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Organizer Email</TableCell>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Phone Number</TableCell>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {events.length > 0 ? (
+                    events.map((event, index) => (
+                      <TableRow
+                        key={event._id || index} // Use _id if available, otherwise index
                         sx={{
-                          px: 3,
-                          py: 1,
-                          borderRadius: 3,
-                          textTransform: 'none'
+                          '&:last-child td, &:last-child th': { border: 0 },
+                          borderBottom: '1px solid rgba(224, 224, 224, 1)'
                         }}
                       >
-                        Join
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                        <TableCell>{index + 1}.</TableCell>
+                        <TableCell>{event.eventName || event.type}</TableCell> {/* Assuming eventName or type */}
+                        <TableCell>{event.organizerName || event.organizer}</TableCell> {/* Assuming organizerName or organizer */}
+                        <TableCell>{event.organizerEmail || "N/A"}</TableCell> {/* Assuming organizerEmail */}
+                        <TableCell>{event.phoneNumber || "N/A"}</TableCell> {/* Assuming phoneNumber */}
+                        <TableCell>
+                          <Button
+                            onClick={() => handleJoin(event._id)}
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                              px: 3,
+                              py: 1,
+                              borderRadius: 3,
+                              textTransform: 'none'
+                            }}
+                          >
+                            Join
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} sx={{ textAlign: 'center' }}>No events found.</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </Box>
       </Container>
       <Footer />

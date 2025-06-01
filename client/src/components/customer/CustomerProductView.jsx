@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import CustomerNavbar from '../Navbar/CustomerNavbar';
-import { Box, Button, Typography, Avatar, Modal, Fade, Backdrop, Card, TextField, Stack, Container } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Button, Typography, Avatar, Modal, Fade, Backdrop, Card, TextField, Stack, Container, Grid } from '@mui/material';
 import coin from "../../assets/image 94.png";
 import Footer from '../Footer/Footer';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from '../../api/axiosInstance';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 import arrow from "../../assets/arrow.png";
@@ -15,20 +14,11 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import CloseIcon from '@mui/icons-material/Close';
 import { baseUrl } from '../../baseUrl';
+import Rating from '@mui/material/Rating';
+import StarIcon from '@mui/icons-material/Star';
 
 const CustomerProductView = () => {
     // Styled components
-    const StyledTextField = styled(TextField)({
-        borderRadius: "8px",
-        width: "100%",
-        border: "1px solid #CCCCCC",
-        '& .MuiInputBase-root': {
-            height: "40px",
-            '& .MuiInputBase-input': {
-                padding: '10px 0px',
-            }
-        }
-    });
 
     // Modal styles
     const styleLogout = {
@@ -71,23 +61,85 @@ const CustomerProductView = () => {
     const [error, setError] = useState({});
     const [imagePreview, setImagePreview] = useState(null);
     const navigate = useNavigate();
+    const { id: businessId } = useParams(); // Get businessId from URL
 
     // Fetch customer data
+    const [products, setProducts] = useState([]);
+    const [businessDetails, setBusinessDetails] = useState(null);
+    const [reviewData, setReviewData] = useState({
+        rating: 0,
+        comment: ""
+    });
+    const [reviews, setReviews] = useState([]);
+    const [editingReview, setEditingReview] = useState(null); // New state for editing review
+
     const fetchUser = async () => {
         const token = localStorage.getItem('token');
-        const decoded = jwtDecode(token);
-        const customer = await axios.get(`${baseUrl}customer/getcustomer/${decoded.id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        localStorage.setItem("customerDetails", JSON.stringify(customer.data.customer));
-        setCustomer(customer.data.customer);
+        if (!token) {
+            navigate('/customer/login');
+            return;
+        }
+        try {
+            const decoded = jwtDecode(token);
+            const customer = await axios.get(`${baseUrl}customer/getcustomer/${decoded.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            localStorage.setItem("customerDetails", JSON.stringify(customer.data.customer));
+            setCustomer(customer.data.customer);
+        } catch (error) {
+            console.error("Error fetching customer:", error);
+            toast.error("Error fetching customer details.");
+            if (error.response && error.response.status === 401) {
+                handleLogOut();
+            }
+        }
+    };
+
+    const fetchProducts = async () => {
+        try {
+            // Assuming a public endpoint or an endpoint that takes businessId as query param
+            const response = await axios.get(`${baseUrl}bussiness/viewproduct`, {
+                params: { bussinessId: businessId }
+            });
+            setProducts(response.data.products);
+            // Assuming the first product or a separate endpoint provides business details
+            if (response.data.products.length > 0) {
+                // This is a workaround. Ideally, there should be a GET /bussiness/getbussiness/:id endpoint
+                const businessRes = await axios.get(`${baseUrl}bussiness/getbussiness/${businessId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`, // Business details might be protected
+                    },
+                });
+                setBusinessDetails(businessRes.data.bussiness);
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            toast.error("Error fetching products.");
+        }
+    };
+
+    const fetchReviews = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${baseUrl}api/reviews/${businessId}`, { // Assuming an endpoint to get reviews for a business
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setReviews(response.data.data);
+        } catch (error) {
+            console.error("Error fetching reviews:", error);
+            toast.error("Error fetching reviews.");
+        }
     };
 
     useEffect(() => {
         fetchUser();
-    }, []);
+        fetchProducts();
+        fetchReviews();
+    }, [businessId]);
 
     // Modal handlers
     const handleOpen = () => setOpen(true);
@@ -146,7 +198,7 @@ const CustomerProductView = () => {
         let isValid = true;
         let errorMessage = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
+
         if (!data.name.trim()) {
             errorMessage.name = "Name should not be empty";
             isValid = false;
@@ -154,7 +206,7 @@ const CustomerProductView = () => {
             errorMessage.name = "Name should be 3 to 20 char length";
             isValid = false;
         }
-        
+
         if (!data.email.trim()) {
             errorMessage.email = "Email should not be empty";
             isValid = false;
@@ -170,7 +222,7 @@ const CustomerProductView = () => {
             errorMessage.address = "Address should not be empty";
             isValid = false;
         }
-        
+
         if (!data.phone) {
             errorMessage.phone = "Phone should not be empty";
             isValid = false;
@@ -213,47 +265,112 @@ const CustomerProductView = () => {
                 toast.error("Error updating profile");
             }
         } catch (error) {
+            console.error("Error updating profile:", error);
             toast.error("Error updating profile");
         }
     };
 
     // Text field style
-    const textFieldStyle = { 
-        height: "65px", 
-        width: "360px", 
-        display: "flex", 
-        flexDirection: "column", 
-        justifyContent: "start", 
-        position: "relative" 
+    const textFieldStyle = {
+        height: "65px",
+        width: "360px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "start",
+        position: "relative"
     };
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/customer/login");
+    const handleReviewChange = (e) => {
+        const { name, value } = e.target;
+        setReviewData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleRatingChange = (event, newValue) => {
+        setReviewData(prev => ({ ...prev, rating: newValue }));
+    };
+
+    const handleEditReviewClick = (review) => {
+        setEditingReview(review);
+        setReviewData({
+            rating: review.rating,
+            comment: review.comment
+        });
+    };
+
+    const handleCancelEdit = () => {
+        setEditingReview(null);
+        setReviewData({ rating: 0, comment: "" });
+    };
+
+    const handleReviewSubmit = async () => {
+        if (!reviewData.rating || !reviewData.comment.trim()) {
+            toast.error("Please provide a rating and a comment for your review.");
             return;
         }
-    }, []);
+        try {
+            const token = localStorage.getItem("token");
+            let response;
+            if (editingReview) {
+                // Update existing review
+                response = await axios.put(`${baseUrl}api/reviews/${editingReview._id}`, {
+                    rating: reviewData.rating,
+                    comment: reviewData.comment
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (response.data.message === "Review updated successfully.") {
+                    toast.success("Review updated successfully!");
+                } else {
+                    toast.error("Failed to update review.");
+                }
+            } else {
+                // Submit new review
+                response = await axios.post(`${baseUrl}api/reviews`, {
+                    consumer: customer._id,
+                    business: businessId,
+                    rating: reviewData.rating,
+                    comment: reviewData.comment
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (response.data.message === "Review created successfully") {
+                    toast.success("Review submitted successfully!");
+                } else {
+                    toast.error("Failed to submit review.");
+                }
+            }
+            setReviewData({ rating: 0, comment: "" });
+            setEditingReview(null); // Clear editing state
+            fetchReviews(); // Refresh reviews
+        } catch (error) {
+            console.error("Error submitting/updating review:", error);
+            toast.error("Error submitting/updating review.");
+        }
+    };
 
     return (
         <>
             <CustomerNavbar customerdetails={customer} onAvatarClick={onAvatarClick} />
-            
+
             {/* Profile Card */}
             {showProfileCard && (
                 <ClickAwayListener onClickAway={() => setShowProfileCard(false)}>
                     <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5, width: "375px" }}>
                         <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
-                            <Avatar 
-                                sx={{ 
-                                    height: "146px", 
-                                    width: "146px", 
-                                    position: "absolute", 
-                                    top: "50px", 
-                                    left: "100px", 
-                                    zIndex: 2 
+                            <Avatar
+                                sx={{
+                                    height: "146px",
+                                    width: "146px",
+                                    position: "absolute",
+                                    top: "50px",
+                                    left: "100px",
+                                    zIndex: 2
                                 }}
-                                src={`${baseUrl}uploads/${customer?.profilePic?.filename}`} 
+                                src={`${baseUrl}uploads/${customer?.profilePic?.filename}`}
                                 alt={customer?.name}
                             />
                             <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
@@ -273,18 +390,18 @@ const CustomerProductView = () => {
                                     <LocationOnOutlinedIcon />{customer.address}
                                 </Typography>
                                 <Box display={"flex"} gap={3} alignItems={"center"}>
-                                    <Button 
-                                        variant='contained' 
-                                        color='secondary' 
-                                        sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} 
+                                    <Button
+                                        variant='contained'
+                                        color='secondary'
+                                        sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }}
                                         onClick={handleEditOpen}
                                     >
                                         Edit
                                     </Button>
-                                    <Button 
-                                        variant='contained' 
-                                        color='secondary' 
-                                        sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} 
+                                    <Button
+                                        variant='contained'
+                                        color='secondary'
+                                        sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }}
                                         onClick={handleOpen}
                                     >
                                         Logout
@@ -297,50 +414,109 @@ const CustomerProductView = () => {
             )}
 
             {/* Product View Content */}
-            <Box>
-                <Typography sx={{ fontSize: "24px", fontWeight: "400", ml: "150px" }} variant='h4'>View Products</Typography>
-            </Box>
-            <Box display={"flex"} alignItems={"start"} sx={{ ml: "150px", mt: "60px", gap: "70px" }}>
-                <Box sx={{ gap: "20px" }} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"center"}>
-                    <Box sx={{ height: "575px", width: "500px" }} component="img" src={coin} alt='coin'></Box>
-                    <Box sx={{ gap: "20px", mt: "20px" ,mb:"50px"}} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"start"}>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>Reviews and Ratings</Typography>
-                        <textarea rows={4} style={{ width: "360px" }}></textarea>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>3.5★</Typography>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>12,371 Ratings &</Typography>
-                        <Typography color='primary' sx={{ fontSize: "15px", fontWeight: "400" }} variant='p'>871 Reviews</Typography>
-                    </Box>
-                </Box>
-                <Box sx={{ gap: "80px" }} display={"flex"} justifyContent={"center"} alignItems={"start"}>
-                    <Box sx={{ gap: "40px",width:"500px" }} display={"flex"} flexDirection={"column"} alignItems={"start"}>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Product Name</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Color</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Weight</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Adds</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Stock Available</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Price</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Special Offer</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Discount Price</Typography>
-                        <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Description</Typography>
-                    </Box>
-                    <Box display={"flex"} flexDirection={"column"} alignItems={"end"} sx={{gap:'100px',mr:"100px"}}>
-                        <Box sx={{ gap: "40px" }} display={"flex"} flexDirection={"column"} alignItems={"start"}>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Tea Light Candle</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>White</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>100gm</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>20</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>50</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>200</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Get extra 31% off (price inclusive of cashback/coupon)</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>180</Typography>
-                            <Typography color='primary' sx={{ fontSize: "18px", fontWeight: "400" }} variant='p'>Enhance your space with this high-quality candle, designed to create a warm and soothing ambiance. Made from premium wax, it offers a clean and smokeless burn, making it ideal for home décor, relaxation, and special occasions.</Typography>
-                        </Box>
-                        <Button sx={{background:"#9B70D3",color:"white",  borderRadius: "15px"}}>
-                            update
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                <Typography variant='h4' sx={{ fontSize: "28px", fontWeight: "600", color: "text.primary", mb: 4, textAlign: 'center' }}>
+                    Products from {businessDetails?.bussinessName || "Business"}
+                </Typography>
+
+                {(products && products.length > 0) ? (
+                    <Grid container spacing={4}>
+                        {products.map((product) => (
+                            <Grid item xs={12} sm={6} md={4} key={product._id}>
+                                <Card sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                    <Box sx={{ height: 200, overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
+                                        <img
+                                            src={product.photo?.filename ? `${baseUrl}uploads/${product.photo.filename}` : coin}
+                                            alt={product.productName}
+                                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                        />
+                                    </Box>
+                                    <Typography variant='h6' gutterBottom>{product.productName}</Typography>
+                                    <Typography variant='body2' color='text.secondary' sx={{ flexGrow: 1 }}>{product.productDescription}</Typography>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center" mt={2}>
+                                        <Typography variant='body1' fontWeight="bold">Price: ${product.price}</Typography>
+                                        {product.discountPrice && (
+                                            <Typography variant='body2' color='error' sx={{ textDecoration: 'line-through' }}>
+                                                ${product.discountPrice}
+                                            </Typography>
+                                        )}
+                                    </Stack>
+                                    <Typography variant='body2' color='text.secondary'>Stock: {product.stockavailable}</Typography>
+                                    <Typography variant='body2' color='text.secondary'>Category: {product.category}</Typography>
+                                    <Button variant="contained" sx={{ mt: 2 }}>
+                                        Add to Cart (Placeholder)
+                                    </Button>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                ) : (
+                    <Typography variant="h6" textAlign="center" sx={{ mt: 5 }}>
+                        No products available for this business.
+                    </Typography>
+                )}
+
+                {/* Reviews Section */}
+                <Box sx={{ mt: 8, p: 4, border: '1px solid #e0e0e0', borderRadius: '8px', bgcolor: 'background.paper' }}>
+                    <Typography variant='h5' gutterBottom>Reviews</Typography>
+                    <Stack spacing={2} mb={4}>
+                        {reviews.length > 0 ? (
+                            reviews.map((review) => (
+                                <Card key={review._id} sx={{ p: 2 }}>
+                                    <Typography variant="subtitle1" fontWeight="bold">{review.consumer?.name || "Anonymous"}</Typography>
+                                    <Rating
+                                        name="read-only"
+                                        value={review.rating}
+                                        readOnly
+                                        precision={0.5}
+                                        emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+                                    />
+                                    <Typography variant="body2">{review.comment}</Typography>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        sx={{ mt: 1 }}
+                                        onClick={() => handleEditReviewClick(review)}
+                                    >
+                                        Edit
+                                    </Button>
+                                </Card>
+                            ))
+                        ) : (
+                            <Typography variant="body2" color="text.secondary">No reviews yet. Be the first to review!</Typography>
+                        )}
+                    </Stack>
+
+                    <Typography variant='h6' gutterBottom>Submit a Review</Typography>
+                    <Stack spacing={2}>
+                        <Rating
+                            name="rating"
+                            value={reviewData.rating}
+                            onChange={handleRatingChange}
+                            precision={1}
+                            emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+                        />
+                        <TextField
+                            label="Your Comment"
+                            name="comment"
+                            multiline
+                            rows={4}
+                            value={reviewData.comment}
+                            onChange={handleReviewChange}
+                            fullWidth
+                            variant="outlined"
+                        />
+                        <Button variant="contained" onClick={handleReviewSubmit} sx={{ alignSelf: 'flex-end' }}>
+                            {editingReview ? "Update Review" : "Submit Review"}
                         </Button>
-                    </Box>
+                        {editingReview && (
+                            <Button variant="outlined" onClick={handleCancelEdit} sx={{ alignSelf: 'flex-end', ml: 2 }}>
+                                Cancel Edit
+                            </Button>
+                        )}
+                    </Stack>
                 </Box>
-            </Box>
+            </Container>
 
             <Footer />
 
@@ -418,7 +594,7 @@ const CustomerProductView = () => {
                                     <Stack direction="row" sx={{ display: "flex", gap: "15px" }}>
                                         <div style={textFieldStyle}>
                                             <label>Name</label>
-                                            <input 
+                                            <input
                                                 style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
                                                 onChange={handleDataChange}
                                                 name='name'
@@ -429,7 +605,7 @@ const CustomerProductView = () => {
                                         </div>
                                         <div style={textFieldStyle}>
                                             <label>Address</label>
-                                            <input 
+                                            <input
                                                 style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
                                                 onChange={handleDataChange}
                                                 name='address'
@@ -441,7 +617,7 @@ const CustomerProductView = () => {
                                     <Stack direction={'row'} sx={{ display: "flex", gap: "15px" }}>
                                         <div style={textFieldStyle}>
                                             <label>Email</label>
-                                            <input 
+                                            <input
                                                 style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
                                                 onChange={handleDataChange}
                                                 name='email'
@@ -451,7 +627,7 @@ const CustomerProductView = () => {
                                         </div>
                                         <div style={textFieldStyle}>
                                             <label>Phone Number</label>
-                                            <input 
+                                            <input
                                                 style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
                                                 onChange={handleDataChange}
                                                 name='phone'
@@ -463,9 +639,9 @@ const CustomerProductView = () => {
                                     </Stack>
                                 </Box>
                                 <Box display={'flex'} alignItems={'center'} justifyContent={'center'} flexDirection={'column'} sx={{ width: '253px', height: "93px", gap: '10px' }}>
-                                    <Button 
-                                        variant='contained' 
-                                        color='secondary' 
+                                    <Button
+                                        variant='contained'
+                                        color='secondary'
                                         sx={{ borderRadius: "25px", marginTop: "20px", height: "40px", width: '200px', padding: '10px 35px' }}
                                         onClick={handleSubmit}
                                     >

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import BussinessNavbar from '../Navbar/BussinessNavbar';
 import { Container, Stack, Typography, Box, Button, Modal, Fade, Backdrop, Grid, Card, Avatar } from '@mui/material';
 import Footer from '../Footer/Footer';
-import axios from "axios";
 import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import CloseIcon from '@mui/icons-material/Close';
@@ -14,6 +13,7 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { ClickAwayListener } from '@mui/material';
+import axiosInstance from '../../api/axiosInstance';
 
 const BussinessAddProduct = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
@@ -36,14 +36,10 @@ const BussinessAddProduct = () => {
                 navigate('/bussiness/login');
                 return;
             }
-            
+
             const decoded = jwtDecode(token);
-            const response = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            
+            const response = await axiosInstance.get(`/bussiness/getbussiness/${decoded.id}`);
+
             if (response.data && response.data.bussiness) {
                 localStorage.setItem("bussinessDetails", JSON.stringify(response.data.bussiness));
                 setBussiness(response.data.bussiness);
@@ -71,14 +67,14 @@ const BussinessAddProduct = () => {
         category: "",
         photo: null,
     });
-    
+
     const handleDataChange = (e) => {
         const { name, value } = e.target;
         setError((prevError) => ({
             ...prevError,
             [name]: ""
         }));
-        
+
         setData(prev => {
             return { ...prev, [name]: value }
         })
@@ -97,11 +93,11 @@ const BussinessAddProduct = () => {
             setPhotoPreview(objectURL);
         }
     }
-    
+
     const validation = () => {
         let isValid = true;
         let errorMessage = {};
-        
+
         if (!data.productName.trim()) {
             errorMessage.productName = "Product name should not be empty"
             isValid = false;
@@ -110,7 +106,7 @@ const BussinessAddProduct = () => {
             errorMessage.productName = "Product name should be 3 to 20 char length"
             isValid = false;
         }
-        
+
         if (!data.productDescription.trim()) {
             errorMessage.productDescription = "Product description should not be empty";
             isValid = false;
@@ -130,7 +126,7 @@ const BussinessAddProduct = () => {
             errorMessage.price = "Price should not be empty"
             isValid = false;
         }
-        
+
         if (!data.stockavailable) {
             errorMessage.stockavailable = "Stock available should not be empty"
             isValid = false;
@@ -140,34 +136,34 @@ const BussinessAddProduct = () => {
             errorMessage.discountPrice = "Discount price should not be empty"
             isValid = false;
         }
-        
+
         if (!data.specialOffer.trim()) {
             errorMessage.specialOffer = "Special offer should not be empty"
             isValid = false;
         }
-        
+
         if (!data.category.trim()) {
             errorMessage.category = "Category should not be empty"
             isValid = false;
         }
-        
+
         if (!data.photo) {
             errorMessage.photo = "Photo should not be empty"
             isValid = false;
         }
-        
+
         setError(errorMessage);
         return isValid;
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         const isValid = validation();
         if (!isValid) {
             return;
         }
-        
+
         const formData = new FormData();
         formData.append('productName', data.productName);
         formData.append('productDescription', data.productDescription);
@@ -179,11 +175,11 @@ const BussinessAddProduct = () => {
         formData.append('specialOffer', data.specialOffer);
         formData.append('category', data.category);
         formData.append('photo', data.photo);
-        
+        formData.append('bussinessId', bussinessdetails._id); // Add bussinessId
+
         try {
-            const response = await axios.post(`${baseUrl}bussiness/addproduct`, formData, {
+            const response = await axiosInstance.post('/bussiness/addproduct', formData, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
                 }
             });
@@ -191,7 +187,7 @@ const BussinessAddProduct = () => {
             const result = response.data;
             console.log(result);
 
-            if (result.message === "bussiness Product added successfully") {
+            if (result.message === "bussiness Product added successfully") { // Updated success message check
                 setData({
                     productName: "",
                     productDescription: "",
@@ -357,12 +353,8 @@ const BussinessAddProduct = () => {
         }
 
         try {
-            const updated = await axios.post(`${baseUrl}bussiness/editBussiness/${bussiness._id}`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            
+            const updated = await axiosInstance.post(`/bussiness/editBussiness/${bussiness._id}`, formData);
+
             if (updated.data && updated.data.message === "bussiness updated successfully.") {
                 toast.success("Business updated successfully.")
                 setEditOpen(false);
@@ -382,9 +374,9 @@ const BussinessAddProduct = () => {
 
     return (
         <>
-            <BussinessNavbar 
-                bussinessdetails={bussiness} 
-                onAvatarClick={onAvatarClick} 
+            <BussinessNavbar
+                bussinessdetails={bussiness}
+                onAvatarClick={onAvatarClick}
             />
 
             {showProfileCard && (
@@ -392,7 +384,7 @@ const BussinessAddProduct = () => {
                     <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5, width: "375px" }}>
                         <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
                             <Avatar sx={{ height: "146px", width: "146px", position: "absolute", top: "50px", left: "100px", zIndex: 2 }}
-                                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""} 
+                                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""}
                                 alt={bussiness?.name || "Business"}></Avatar>
                             <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
                                 <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }}></Box>

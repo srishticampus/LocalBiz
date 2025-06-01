@@ -24,10 +24,12 @@ const BussinessHome = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
+    const [analyticsData, setAnalyticsData] = useState(null);
 
     useEffect(() => {
         fetchProducts();
         fetchUser();
+        fetchAnalytics();
     }, []);
 
     useEffect(() => {
@@ -35,7 +37,7 @@ const BussinessHome = () => {
         if (searchTerm.trim() === "") {
             setFilteredProducts(products);
         } else {
-            const filtered = products.filter(product => 
+            const filtered = products.filter(product =>
                 product.productName.toLowerCase().includes(searchTerm.toLowerCase())
             );
             setFilteredProducts(filtered);
@@ -89,14 +91,14 @@ const BussinessHome = () => {
                 navigate('/bussiness/login');
                 return;
             }
-            
+
             const decoded = jwtDecode(token);
             const response = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            
+
             if (response.data && response.data.bussiness) {
                 localStorage.setItem("bussinessDetails", JSON.stringify(response.data.bussiness));
                 setBussiness(response.data.bussiness);
@@ -107,6 +109,27 @@ const BussinessHome = () => {
             toast.error("Error fetching business details");
         }
     }
+
+    const fetchAnalytics = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/bussiness/login');
+                return;
+            }
+            const response = await axios.get(`${baseUrl}api/business/analytics`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (response.data && response.data.data) {
+                setAnalyticsData(response.data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching business analytics:", error);
+            toast.error("Error fetching business analytics");
+        }
+    };
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
@@ -232,7 +255,7 @@ const BussinessHome = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            
+
             if (updated.data && updated.data.message === "bussiness updated successfully.") {
                 toast.success("Business updated successfully.")
                 setEditOpen(false);
@@ -282,9 +305,9 @@ const BussinessHome = () => {
 
     return (
         <>
-            <BussinessNavbar 
-                bussinessdetails={bussiness} 
-                onAvatarClick={onAvatarClick} 
+            <BussinessNavbar
+                bussinessdetails={bussiness}
+                onAvatarClick={onAvatarClick}
                 searchTerm={searchTerm}
                 onSearchChange={handleSearchChange}
             />
@@ -294,7 +317,7 @@ const BussinessHome = () => {
                     <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5, width: "375px" }}>
                         <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
                             <Avatar sx={{ height: "146px", width: "146px", position: "absolute", top: "50px", left: "100px", zIndex: 2 }}
-                                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""} 
+                                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""}
                                 alt={bussiness?.name || "Business"}></Avatar>
                             <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
                                 <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }}></Box>
@@ -325,6 +348,49 @@ const BussinessHome = () => {
                         Add Product
                     </Button>
                 </Link>
+            </Box>
+
+            {/* Business Analytics Section */}
+            <Box sx={{
+                border: "1px solid black",
+                borderRadius: "15px",
+                margin: "20px 75px",
+                padding: "20px",
+                mt: 4
+            }}>
+                <Typography variant='h5' sx={{ fontSize: "24px", fontWeight: "600", color: "black", mb: 2 }}>Business Analytics</Typography>
+                {analyticsData ? (
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <Card sx={{ p: 2, bgcolor: '#f0f0f0' }}>
+                                <Typography variant='h6'>Total Sales:</Typography>
+                                <Typography variant='h4'>{analyticsData.totalSales}</Typography>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Card sx={{ p: 2, bgcolor: '#f0f0f0' }}>
+                                <Typography variant='h6'>Total Views:</Typography>
+                                <Typography variant='h4'>{analyticsData.totalViews}</Typography>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant='h6' sx={{ mt: 2 }}>Product Sales:</Typography>
+                            {analyticsData.productSales && analyticsData.productSales.length > 0 ? (
+                                <Stack spacing={1}>
+                                    {analyticsData.productSales.map((product) => (
+                                        <Typography key={product.productId} variant='body1'>
+                                            {product.productName}: {product.salesCount} sales
+                                        </Typography>
+                                    ))}
+                                </Stack>
+                            ) : (
+                                <Typography variant='body2' color='text.secondary'>No product sales data available.</Typography>
+                            )}
+                        </Grid>
+                    </Grid>
+                ) : (
+                    <Typography variant="body1" color="text.secondary">Loading analytics data...</Typography>
+                )}
             </Box>
 
             <Box sx={{
@@ -388,19 +454,17 @@ const BussinessHome = () => {
                                                 flexDirection: { xs: 'column', sm: 'row' }
                                             }}
                                         >
-                                            {item.photo && item.photo.filename && (
-                                                <Box
-                                                    component="img"
-                                                    src={`${baseUrl}uploads/${item.photo.filename}`}
-                                                    sx={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: 'cover',
-                                                        borderRadius: '8px'
-                                                    }}
-                                                    alt={item.productName || "Product"}
-                                                />
-                                            )}
+                                            <Box
+                                                component="img"
+                                                src={item.photo?.filename ? `${baseUrl}uploads/${item.photo.filename}` : "https://via.placeholder.com/100"}
+                                                sx={{
+                                                    width: "100px",
+                                                    height: "100px",
+                                                    objectFit: 'cover',
+                                                    borderRadius: '8px'
+                                                }}
+                                                alt={item.productName || "Product"}
+                                            />
                                             <Box
                                                 sx={{
                                                     display: 'flex',
@@ -476,6 +540,7 @@ const BussinessHome = () => {
                                                 marginTop: '20px'
                                             }}
                                         >
+                                            {console.log("Navigating to product ID:", item._id)} {/* Added log */}
                                             <Link to={`/bussiness/ViewProduct/${item._id}`} style={{ textDecoration: 'none' }}>
                                                 <Button
                                                     variant="contained"

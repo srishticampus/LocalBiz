@@ -17,43 +17,9 @@ import { ClickAwayListener } from '@mui/material';
 import { baseUrl } from '../../baseUrl';
 
 export default function ViewTrainning() {
-  const events = [
-    {
-      id: 1,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-    {
-      id: 2,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-    {
-      id: 3,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-    {
-      id: 4,
-      eventName: "Handmade Crafts Workshop",
-      organizerName: "Creative Hands Community",
-      organizerEmail: "creativehands@example.com",
-      phoneNumber: "+12 1234 1234 1234",
-    },
-  ];
-
-  const [bussinessdetails, setBussinessdetails] = useState(
-    JSON.parse(localStorage.getItem("bussinessDetails")) || {}
-  );
-  const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const [bussiness, setBussiness] = useState({});
+  const [trainings, setTrainings] = useState([]); // Changed from events to trainings
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [showProfileCard, setShowProfileCard] = useState(false);
@@ -68,7 +34,7 @@ export default function ViewTrainning() {
   const [imagePreview, setImagePreview] = useState(null);
 
   const handleJoin = (id) => {
-    console.log(`Joined event with ID: ${id}`);
+    console.log(`Joined training with ID: ${id}`);
   };
 
   useEffect(() => {
@@ -82,24 +48,44 @@ export default function ViewTrainning() {
         navigate('/bussiness/login');
         return;
       }
-      
+
       const decoded = jwtDecode(token);
       const response = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (response.data && response.data.bussiness) {
-        localStorage.setItem("bussinessDetails", JSON.stringify(response.data.bussiness));
         setBussiness(response.data.bussiness);
-        setBussinessdetails(response.data.bussiness);
       }
     } catch (error) {
       console.error("Error fetching business details:", error);
       toast.error("Error fetching business details");
     }
-  }
+  };
+
+  useEffect(() => {
+    const fetchTrainings = async () => {
+      if (bussiness._id) {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await axios.get(`${baseUrl}api/events/bussiness/${bussiness._id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.data && response.data.events) {
+            setTrainings(response.data.events);
+          }
+        } catch (error) {
+          console.error("Error fetching trainings:", error);
+          toast.error("Error fetching trainings");
+        }
+      }
+    };
+    fetchTrainings();
+  }, [bussiness._id]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -212,7 +198,7 @@ export default function ViewTrainning() {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (updated.data && updated.data.message === "bussiness updated successfully.") {
         toast.success("Business updated successfully.")
         setEditOpen(false);
@@ -260,9 +246,9 @@ export default function ViewTrainning() {
 
   return (
     <div>
-      <BussinessNavbar 
-        bussinessdetails={bussiness} 
-        onAvatarClick={onAvatarClick} 
+      <BussinessNavbar
+        bussinessdetails={bussiness}
+        onAvatarClick={onAvatarClick}
       />
 
       {showProfileCard && (
@@ -270,7 +256,7 @@ export default function ViewTrainning() {
           <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5, width: "375px" }}>
             <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
               <Avatar sx={{ height: "146px", width: "146px", position: "absolute", top: "50px", left: "100px", zIndex: 2 }}
-                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""} 
+                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""}
                 alt={bussiness?.name || "Business"}></Avatar>
               <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
                 <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }}></Box>
@@ -291,23 +277,23 @@ export default function ViewTrainning() {
       )}
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box 
-          component={Paper} 
-          elevation={3} 
-          sx={{ 
-            p: 4, 
+        <Box
+          component={Paper}
+          elevation={3}
+          sx={{
+            p: 4,
             borderRadius: 4,
             width: '100%'
           }}
         >
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{ 
-              fontWeight: 300, 
-              color: 'text.secondary', 
-              textAlign: 'center', 
-              mb: 5 
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              fontWeight: 300,
+              color: 'text.secondary',
+              textAlign: 'center',
+              mb: 5
             }}
           >
             View Trainings
@@ -318,30 +304,30 @@ export default function ViewTrainning() {
               <TableHead>
                 <TableRow sx={{ borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
                   <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>S NO</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Event Name</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Organizer Name</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Organizer Email</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Phone Number</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Training Type</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Organizer</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Description</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Date</TableCell>
                   <TableCell sx={{ color: 'primary.main', fontWeight: 'medium' }}>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {events.map((event) => (
-                  <TableRow 
-                    key={event.id} 
-                    sx={{ 
+                {trainings.map((training, index) => (
+                  <TableRow
+                    key={training._id}
+                    sx={{
                       '&:last-child td, &:last-child th': { border: 0 },
                       borderBottom: '1px solid rgba(224, 224, 224, 1)'
                     }}
                   >
-                    <TableCell>{event.id}.</TableCell>
-                    <TableCell>{event.eventName}</TableCell>
-                    <TableCell>{event.organizerName}</TableCell>
-                    <TableCell>{event.organizerEmail}</TableCell>
-                    <TableCell>{event.phoneNumber}</TableCell>
+                    <TableCell>{index + 1}.</TableCell>
+                    <TableCell>{training.type}</TableCell>
+                    <TableCell>{training.organizer}</TableCell>
+                    <TableCell>{training.description}</TableCell>
+                    <TableCell>{new Date(training.date).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Button
-                        onClick={() => handleJoin(event.id)}
+                        onClick={() => handleJoin(training._id)}
                         variant="contained"
                         color="primary"
                         sx={{
@@ -373,9 +359,9 @@ export default function ViewTrainning() {
           closeAfterTransition
           slots={{ backdrop: Backdrop }}
           slotProps={{
-              backdrop: {
-                  timeout: 500,
-              },
+            backdrop: {
+              timeout: 500,
+            },
           }}
         >
           <Fade in={open}>
@@ -407,9 +393,9 @@ export default function ViewTrainning() {
           closeAfterTransition
           slots={{ backdrop: Backdrop }}
           slotProps={{
-              backdrop: {
-                  timeout: 500,
-              },
+            backdrop: {
+              timeout: 500,
+            },
           }}
         >
           <Fade in={editOpen}>
@@ -424,15 +410,15 @@ export default function ViewTrainning() {
                   <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
                     <Stack spacing={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
                       <input
-                          type="file"
-                          id="profile-upload"
-                          accept="image/*"
-                          onChange={handleFileUpload}
-                          style={{ display: "none" }}
+                        type="file"
+                        id="profile-upload"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        style={{ display: "none" }}
                       />
                       <label htmlFor="profile-upload" style={{ cursor: "pointer", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "15px" }}>
-                          <Box component="img" src={imagePreview ? imagePreview : null} alt='profilepic' sx={{ width: "150px", height: "150px", borderRadius: "50%" }}></Box>
-                          {imagePreview ? <Typography></Typography> : <Typography variant='p' color='primary' sx={{ fontSize: "12px", fontWeight: "500" }}>+ Add image</Typography>}
+                        <Box component="img" src={imagePreview ? imagePreview : null} alt='profilepic' sx={{ width: "150px", height: "150px", borderRadius: "50%" }}></Box>
+                        {imagePreview ? <Typography></Typography> : <Typography variant='p' color='primary' sx={{ fontSize: "12px", fontWeight: "500" }}>+ Add image</Typography>}
                       </label>
                     </Stack>
                   </Box>

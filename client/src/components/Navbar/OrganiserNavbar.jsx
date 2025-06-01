@@ -22,31 +22,30 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const pages = [
-        { label: 'Home', path: '/organiser/home' },
+    { label: 'Home', path: '/organiser/home' },
 
-    { label: 'Requests', path: '/organiser/RequestPage' },
-    { 
-        label: 'Activities', 
+    {
+        label: 'Activities',
         path: '#',
         subItems: [
-            { 
-                label: 'Events', 
+            {
+                label: 'Events',
                 path: '#',
                 subItems: [
                     { label: 'Add Event', path: '/organiser/addevents' },
                     { label: 'View Events', path: '/organiser/Viewevents' }
                 ]
             },
-            { 
-                label: 'Trainings', 
+            {
+                label: 'Trainings',
                 path: '#',
                 subItems: [
                     { label: 'Add Training', path: '/organiser/AddTrainning' },
                     { label: 'View Trainings', path: '/organiser/ViewTrainning' }
                 ]
             },
-            { 
-                label: 'Workshops', 
+            {
+                label: 'Workshops',
                 path: '#',
                 subItems: [
                     { label: 'Add Workshop', path: '/organiser/AddWorkShop' },
@@ -58,9 +57,8 @@ const pages = [
     // { label: 'Updates', path: '#' }
 ];
 
-const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
+const OrganiserNavbar = ({ organiserdetails = {}, onAvatarClick }) => {
     const [anchorElNav, setAnchorElNav] = useState(null);
-    const [anchorElUser, setAnchorElUser] = useState(null);
     const [activitiesAnchorEl, setActivitiesAnchorEl] = useState(null);
     const [subMenuAnchorEl, setSubMenuAnchorEl] = useState(null);
     const [currentSubMenu, setCurrentSubMenu] = useState(null);
@@ -68,17 +66,9 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
-    
-    const handleOpenUserMenu = (event) => {
-        setAnchorElUser(event.currentTarget);
-    };
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
-    };
-
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
     };
 
     const handleActivitiesClick = (event) => {
@@ -103,7 +93,7 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
     const renderMenuItem = (item) => {
         if (item.subItems) {
             return (
-                <MenuItem 
+                <MenuItem
                     key={item.label}
                     onClick={item.label === 'Activities' ? handleActivitiesClick : (e) => handleSubMenuOpen(e, item)}
                     sx={{
@@ -119,15 +109,15 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
                     <Typography color='primary' sx={{ color: '#1967D2' }}>
                         {item.label}
                     </Typography>
-                    {item.label === 'Activities' ? 
-                        <KeyboardArrowDownIcon fontSize="small" /> : 
+                    {item.label === 'Activities' ?
+                        <KeyboardArrowDownIcon fontSize="small" /> :
                         <KeyboardArrowRightIcon fontSize="small" />
                     }
                 </MenuItem>
             );
         } else {
             return (
-                <MenuItem 
+                <MenuItem
                     key={item.label}
                     component={Link}
                     to={item.path}
@@ -169,11 +159,11 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
         } else {
             return (
                 <Box key={item.label} sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Link 
+                    <Link
                         style={{ textDecoration: "none" }}
                         to={item.path}
                     >
-                        <Typography 
+                        <Typography
                             sx={{
                                 my: 0,
                                 fontSize: "14px",
@@ -213,7 +203,7 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
                             </Link>
                         </Box>
 
-                        <Box sx={{ flexGrow: 1 }}> 
+                        <Box sx={{ flexGrow: 1 }}>
                             <TextField
                                 variant="outlined"
                                 placeholder="Search..."
@@ -259,33 +249,33 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
                                 {pages.map((page) => renderMenuItem(page))}
                             </Menu>
                         </Box>
-                        
+
                         <Link to='/customer/home'>
                             <Box component="img" src={Logo} sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} ></Box>
                         </Link>
-                        
-                        <Box sx={{ 
-                            flexGrow: 1, 
-                            display: { xs: 'none', md: 'flex' }, 
-                            justifyContent: 'center', 
+
+                        <Box sx={{
+                            flexGrow: 1,
+                            display: { xs: 'none', md: 'flex' },
+                            justifyContent: 'center',
                             alignItems: 'center',
                             gap: "40px"
                         }}>
                             {pages.map((page) => renderDesktopMenu(page))}
                         </Box>
 
-                        <Box sx={{ 
-                            display: "flex", 
-                            alignItems: "center", 
+                        <Box sx={{
+                            display: "flex",
+                            alignItems: "center",
                             gap: "30px",
                             flexShrink: 0
                         }}>
                             <SmsOutlinedIcon color='primary' sx={{ height: '24px' }} />
                             <NotificationsOutlinedIcon color='primary' sx={{ height: '24px' }} />
-                            
+
                             <Box display={"flex"} alignItems={"center"} sx={{ gap: "10px" }}>
                                 <Typography color='secondary'>Hi, {organiserdetails?.name} </Typography>
-                            
+
                                 {organiserdetails?.profilePic?.filename ? (
                                     <Avatar onClick={onAvatarClick} src={`http://localhost:3000/uploads/${organiserdetails?.profilePic?.filename}`} alt={organiserdetails?.name} />
                                 ) : (
@@ -313,7 +303,7 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
                 sx={{ mt: 1 }}
             >
                 {pages.find(page => page.label === 'Activities')?.subItems?.map((item) => (
-                    <MenuItem 
+                    <MenuItem
                         key={item.label}
                         onClick={(e) => {
                             if (item.subItems) {
@@ -353,7 +343,7 @@ const OrganiserNavbar = ({organiserdetails={}, onAvatarClick}) => {
                 sx={{ mt: -1, ml: 0.5 }}
             >
                 {currentSubMenu?.subItems?.map((item) => (
-                    <MenuItem 
+                    <MenuItem
                         key={item.label}
                         component={Link}
                         to={item.path}

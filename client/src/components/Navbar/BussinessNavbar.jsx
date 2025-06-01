@@ -24,9 +24,7 @@ const pages = [
         path: '#',
         submenu: [
             { label: 'Events', path: '/bussiness/ViewEvents' },
-            { label: 'Trainings', path: '/bussiness/ViewTrainning' },
-            { label: 'Workshops', path: '/bussiness/ViewWorkShops' }
-        ]
+            { label: 'Trainings', path: '/bussiness/ViewTrainning' },]
     },
     { label: 'Community', path: '/bussiness/Community' }
 ];
