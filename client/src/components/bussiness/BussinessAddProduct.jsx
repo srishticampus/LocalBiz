@@ -1,26 +1,63 @@
 import React, { useEffect, useState } from 'react'
 import BussinessNavbar from '../Navbar/BussinessNavbar';
-import { Container, Stack, Typography, Box, Button } from '@mui/material';
+import { Container, Stack, Typography, Box, Button, Modal, Fade, Backdrop, Grid, Card, Avatar } from '@mui/material';
 import Footer from '../Footer/Footer';
 import axios from "axios";
-import { Link } from 'react-router-dom';
-import uploadphoto from "../../assets/upphoto.png";
+import { Link, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import CloseIcon from '@mui/icons-material/Close';
 import { toast } from 'react-toastify';
 import { baseUrl } from '../../baseUrl';
+import uploadphoto from "../../assets/upphoto.png";
+import arrow from "../../assets/arrow.png";
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import { ClickAwayListener } from '@mui/material';
 
 const BussinessAddProduct = () => {
     const textFieldStyle = { height: "65px", width: "360px", display: "flex", flexDirection: "column", justifyContent: "start", position: "relative" }
     const siginupStyle = { background: "white", boxShadow: "none" };
+    const navigate = useNavigate();
 
-    const [bussinessdetails,setBussinessdetails]=useState({});
-    useEffect(()=>{
-        const bussinessdetails=localStorage.getItem("bussinessDetails");
+    const [bussinessdetails, setBussinessdetails] = useState({});
+    const [bussiness, setBussiness] = useState({});
+    const token = localStorage.getItem("token");
+
+    useEffect(() => {
+        const bussinessdetails = localStorage.getItem("bussinessDetails");
         setBussinessdetails(JSON.parse(bussinessdetails));
-    }, [])
+        fetchUser();
+    }, []);
 
+    const fetchUser = async () => {
+        try {
+            if (!token) {
+                navigate('/bussiness/login');
+                return;
+            }
+            
+            const decoded = jwtDecode(token);
+            const response = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            
+            if (response.data && response.data.bussiness) {
+                localStorage.setItem("bussinessDetails", JSON.stringify(response.data.bussiness));
+                setBussiness(response.data.bussiness);
+                setBussinessdetails(response.data.bussiness);
+            }
+        } catch (error) {
+            console.error("Error fetching business details:", error);
+            toast.error("Error fetching business details");
+        }
+    }
+
+    // Product related states and functions
     const [photoPreview, setPhotoPreview] = useState(null);
-
-    const [error, setError] = useState({})
+    const [error, setError] = useState({});
 
     const [data, setData] = useState({
         productName: "",
@@ -143,10 +180,8 @@ const BussinessAddProduct = () => {
         formData.append('category', data.category);
         formData.append('photo', data.photo);
         
-        const token = localStorage.getItem("token");
-
         try {
-            const response = await axios.post('http://localhost:4056/bussiness/addproduct', formData, {
+            const response = await axios.post(`${baseUrl}bussiness/addproduct`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -177,12 +212,207 @@ const BussinessAddProduct = () => {
             toast.error(error.response?.data?.message || "Failed to add product");
         }
     }
-    
+
+    // Profile related states and functions
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    const handleLogOut = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('bussinessDetails');
+        navigate('/bussiness/login');
+        toast.success("You have been logged out");
+    }
+
+    const styleLogout = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        borderRadius: "10px",
+        boxShadow: 24,
+        p: 4,
+    };
+
+    const [editOpen, setEditOpen] = React.useState(false);
+    const handleEditOpen = () => {
+        setProfileData({
+            name: bussiness.name || "",
+            email: bussiness.email || "",
+            address: bussiness.address || "",
+            phone: bussiness.phone || "",
+            profilePic: null,
+        });
+        setProfileImagePreview(bussiness?.profilePic
+            ? `${baseUrl}uploads/${bussiness?.profilePic}`
+            : null);
+        setEditOpen(true);
+    }
+    const handleEditClose = () => setEditOpen(false);
+
+    const styleEditBox = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '840px',
+        height: 'auto',
+        bgcolor: 'white',
+        borderRadius: "20px",
+        boxShadow: 24,
+        p: 4,
+    };
+
+    const [profileData, setProfileData] = useState({
+        name: "",
+        email: "",
+        address: "",
+        phone: "",
+        profilePic: null
+    });
+
+    const [profileError, setProfileError] = useState({});
+    const [profileImagePreview, setProfileImagePreview] = useState(null);
+
+    const handleProfileDataChange = (e) => {
+        setProfileError((prevError) => ({
+            ...prevError,
+            [e.target.name]: ""
+        }));
+        const { name, value } = e.target;
+        setProfileData(prev => {
+            return { ...prev, [name]: value }
+        })
+    };
+
+    const handleProfileFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfileData(prev => {
+                return { ...prev, profilePic: file }
+            });
+            const objectURL = URL.createObjectURL(file);
+            setProfileImagePreview(objectURL);
+        }
+    };
+
+    const profileValidation = () => {
+        let isValid = true;
+        let errorMessage = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!profileData.name.trim()) {
+            errorMessage.name = "Name should not be empty"
+            isValid = false;
+        }
+        else if (profileData.name.length < 3 || profileData.name.length > 20) {
+            errorMessage.name = "Name should be 3 to 20 char length"
+            isValid = false;
+        }
+        if (!profileData.email.trim()) {
+            errorMessage.email = "Email should not be empty";
+            isValid = false;
+        }
+        else if (!emailRegex.test(profileData.email)) {
+            errorMessage.email = "Invalid email address";
+            isValid = false;
+        }
+
+        if (profileData.address.length < 10) {
+            errorMessage.address = "Address should be 10 char length"
+            isValid = false;
+        }
+        else if (!profileData.address.trim()) {
+            errorMessage.address = "Address should not be empty"
+            isValid = false;
+        }
+        if (!profileData.phone) {
+            errorMessage.phone = "Phone should not be empty"
+            isValid = false;
+        }
+        else if (!/^\d{10}$/.test(profileData.phone)) {
+            errorMessage.phone = "Phone should be exactly 10 digits and contain only numbers";
+            isValid = false;
+        }
+
+        setProfileError(errorMessage);
+        return isValid;
+    };
+
+    const handleProfileSubmit = async (e) => {
+        const isValid = profileValidation();
+        if (!isValid) {
+            return;
+        }
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('name', profileData.name);
+        formData.append('email', profileData.email);
+        formData.append('address', profileData.address);
+        formData.append('phone', profileData.phone);
+        if (profileData.profilePic) {
+            formData.append('profilePic', profileData.profilePic);
+        }
+
+        try {
+            const updated = await axios.post(`${baseUrl}bussiness/editBussiness/${bussiness._id}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            
+            if (updated.data && updated.data.message === "bussiness updated successfully.") {
+                toast.success("Business updated successfully.")
+                setEditOpen(false);
+                fetchUser();
+            }
+            else {
+                toast.error("Error in updating Business profile")
+            }
+        } catch (error) {
+            console.error("Error updating business:", error);
+            toast.error("Error updating business profile");
+        }
+    }
+
+    const [showProfileCard, setShowProfileCard] = useState(false);
+    const onAvatarClick = () => setShowProfileCard(prev => !prev);
+
     return (
         <>
-            <BussinessNavbar bussinessdetails={bussinessdetails} />
-            <Container sx={{ position: "relative", mb: "50px", siginupStyle }} maxWidth="x-lg">
+            <BussinessNavbar 
+                bussinessdetails={bussiness} 
+                onAvatarClick={onAvatarClick} 
+            />
 
+            {showProfileCard && (
+                <ClickAwayListener onClickAway={() => setShowProfileCard(false)}>
+                    <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5, width: "375px" }}>
+                        <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
+                            <Avatar sx={{ height: "146px", width: "146px", position: "absolute", top: "50px", left: "100px", zIndex: 2 }}
+                                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""} 
+                                alt={bussiness?.name || "Business"}></Avatar>
+                            <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
+                                <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }}></Box>
+                            </Box>
+                            <Box display={"flex"} flexDirection={"column"} alignItems={"center"} p={2} sx={{ gap: "15px", mt: "90px" }}>
+                                <Typography variant='h5' color='secondary' sx={{ fontSize: "24px", fontWeight: "400" }}>{bussiness.name || "Business"}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><EmailOutlinedIcon />{bussiness.email || "No email"}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocalPhoneOutlinedIcon />{bussiness.phone || "No phone"}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocationOnOutlinedIcon />{bussiness.address || "No address"}</Typography>
+                                <Box display={"flex"} gap={3} alignItems={"center"}>
+                                    <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleEditOpen}>Edit</Button>
+                                    <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleOpen}>Logout</Button>
+                                </Box>
+                            </Box>
+                        </Card>
+                    </Box>
+                </ClickAwayListener>
+            )}
+
+            <Container sx={{ position: "relative", mb: "50px", siginupStyle }} maxWidth="x-lg">
                 <Box display={'flex'} alignItems={'center'} justifyContent={'center'} flexDirection={'column'} sx={{ mt: "100px" }}>
                     <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{ mb: "120px" }}>
                         <Typography variant='p' color='secondary' sx={{ fontSize: "32px" }}>Add Products</Typography>
@@ -312,6 +542,135 @@ const BussinessAddProduct = () => {
                 </Box>
             </Container>
             <Footer />
+
+            {/* logout modal */}
+            <div>
+                <Modal
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    open={open}
+                    onClose={handleClose}
+                    closeAfterTransition
+                    slots={{ backdrop: Backdrop }}
+                    slotProps={{
+                        backdrop: {
+                            timeout: 500,
+                        },
+                    }}
+                >
+                    <Fade in={open}>
+                        <Box sx={styleLogout}>
+                            <Box display={"flex"} justifyContent={"space-between"} alignItems={"space-between"}>
+                                <Typography variant='h4' sx={{ fontSize: "18px", fontWeight: "600" }}>Logout</Typography>
+                                <CloseIcon onClick={handleClose} sx={{ fontSize: "18px" }} />
+                            </Box>
+                            <hr />
+                            <Box display={"flex"} alignItems={"center"} justifyContent={"center"} flexDirection={"column"}>
+                                <Typography color='primary' sx={{ fontSize: "12px", fontWeight: '500' }} variant='p'>Are you sure you want to log out ? </Typography>
+                                <Box display={"flex"} alignItems={"center"} justifyContent={"center"} sx={{ gap: "10px" }}>
+                                    <Button variant='outlined' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleLogOut}>yes</Button>
+                                    <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleClose}>no</Button>
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Fade>
+                </Modal>
+            </div>
+
+            {/* edit modal */}
+            <div>
+                <Modal
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    open={editOpen}
+                    onClose={handleEditClose}
+                    closeAfterTransition
+                    slots={{ backdrop: Backdrop }}
+                    slotProps={{
+                        backdrop: {
+                            timeout: 500,
+                        },
+                    }}
+                >
+                    <Fade in={editOpen}>
+                        <Box sx={styleEditBox}>
+                            <Box display={"flex"} justifyContent={"space-between"} alignItems={"space-between"}>
+                                <Typography variant='h4' sx={{ fontSize: "18px", fontWeight: "600" }}>Edit</Typography>
+                                <CloseIcon onClick={handleEditClose} sx={{ fontSize: "18px" }} />
+                            </Box>
+                            <hr />
+                            <Container sx={{ position: "relative" }} maxWidth="x-lg">
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} flexDirection={'column'}>
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
+                                        <Stack spacing={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+                                            <input
+                                                type="file"
+                                                id="profile-upload"
+                                                accept="image/*"
+                                                onChange={handleProfileFileUpload}
+                                                style={{ display: "none" }}
+                                            />
+                                            <label htmlFor="profile-upload" style={{ cursor: "pointer", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "15px" }}>
+                                                <Box component="img" src={profileImagePreview ? profileImagePreview : null} alt='profilepic' sx={{ width: "150px", height: "150px", borderRadius: "50%" }}></Box>
+                                                {profileImagePreview ? <Typography></Typography> : <Typography variant='p' color='primary' sx={{ fontSize: "12px", fontWeight: "500" }}>+ Add image</Typography>}
+                                            </label>
+                                        </Stack>
+                                    </Box>
+                                    <Box sx={{ display: "flex", justifyContent: 'center', alignItems: "start", gap: "30px", height: "154px", flexDirection: "column", marginTop: '30px' }}>
+                                        <Stack direction="row" sx={{ display: "flex", gap: "15px" }}>
+                                            <div style={textFieldStyle}>
+                                                <label>Name</label>
+                                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                                    onChange={handleProfileDataChange}
+                                                    name='name'
+                                                    value={profileData.name}
+                                                    type='text'
+                                                />
+                                                {profileError.name && <span style={{ color: 'red', fontSize: '12px' }}>{profileError.name}</span>}
+                                            </div>
+                                            <div style={textFieldStyle}>
+                                                <label>Address</label>
+                                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                                    onChange={handleProfileDataChange}
+                                                    name='address'
+                                                    value={profileData.address}
+                                                />
+                                                {profileError.address && <span style={{ color: 'red', fontSize: '12px' }}>{profileError.address}</span>}
+                                            </div>
+                                        </Stack>
+                                        <Stack direction={'row'} sx={{ display: "flex", gap: "15px" }}>
+                                            <div style={textFieldStyle}>
+                                                <label>Email</label>
+                                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                                    onChange={handleProfileDataChange}
+                                                    name='email'
+                                                    value={profileData.email}
+                                                />
+                                                {profileError.email && <span style={{ color: 'red', fontSize: '12px' }}>{profileError.email}</span>}
+                                            </div>
+                                            <div style={textFieldStyle}>
+                                                <label>Phone Number</label>
+                                                <input style={{ height: "40px", borderRadius: "8px", border: " 1px solid #CCCCCC", padding: '8px' }}
+                                                    onChange={handleProfileDataChange}
+                                                    name='phone'
+                                                    value={profileData.phone}
+                                                    type='tel'
+                                                />
+                                                {profileError.phone && <span style={{ color: 'red', fontSize: '12px' }}>{profileError.phone}</span>}
+                                            </div>
+                                        </Stack>
+                                    </Box>
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'center'} flexDirection={'column'} sx={{ width: '253px', height: "93px", gap: '10px' }}>
+                                        <Button variant='contained' color='secondary' sx={{ borderRadius: "25px", marginTop: "20px", height: "40px", width: '200px', padding: '10px 35px' }}
+                                            onClick={handleProfileSubmit}
+                                        >Confirm</Button>
+                                    </Box>
+                                </Box>
+                            </Container>
+                        </Box>
+                    </Fade>
+                </Modal>
+            </div>
         </>
     )
 }

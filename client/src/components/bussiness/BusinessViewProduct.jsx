@@ -95,7 +95,7 @@ const BusinessViewProduct = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setProduct(response.data.product);
+            setProduct(response.data.data);
         } catch (error) {
             console.error("Error fetching product:", error);
             toast.error("Error fetching product details");
@@ -214,7 +214,9 @@ const BusinessViewProduct = () => {
         formData.append('email', data.email);
         formData.append('address', data.address);
         formData.append('phone', data.phone);
-        formData.append('profilePic', data.profilePic);
+        if (data.profilePic) {
+            formData.append('profilePic', data.profilePic);
+        }
 
         const token = localStorage.getItem("token");
         try {

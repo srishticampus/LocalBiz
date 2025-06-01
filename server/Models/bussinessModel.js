@@ -37,6 +37,12 @@ const bussinessSchema=mongoose.Schema(
             type:Boolean,
             require:true
         },
+        isVerified: {
+            type: Boolean,
+            default: false
+        },
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
         isActive:{
             type:Boolean,
             default:true
@@ -60,8 +66,21 @@ const bussinessSchema=mongoose.Schema(
         bussinessLogo:{
             type:Object,
             require:true
+        },
+        location: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point'
+            },
+            coordinates: {
+                type: [Number],
+                index: '2dsphere'
+            }
         }
     },{timeStamps:true}
-)
+);
+
+bussinessSchema.index({ location: '2dsphere' },{background:false})
 
 module.exports=mongoose.model("bussiness",bussinessSchema)

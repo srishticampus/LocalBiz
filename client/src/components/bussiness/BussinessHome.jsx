@@ -12,38 +12,60 @@ import arrow from "../../assets/arrow.png";
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
+import { ClickAwayListener } from '@mui/material';
 import { baseUrl } from '../../baseUrl';
 
 const BussinessHome = () => {
-    const bussinessdetails = JSON.parse(localStorage.getItem("bussinessDetails"));
+    const [bussinessdetails, setBussinessdetails] = useState(
+        JSON.parse(localStorage.getItem("bussinessDetails")) || {}
+    );
     const token = localStorage.getItem("token");
     const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchProducts();
         fetchUser();
     }, []);
 
+    useEffect(() => {
+        // Filter products based on search term whenever products or searchTerm changes
+        if (searchTerm.trim() === "") {
+            setFilteredProducts(products);
+        } else {
+            const filtered = products.filter(product => 
+                product.productName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredProducts(filtered);
+        }
+    }, [searchTerm, products]);
+
     const fetchProducts = async () => {
         try {
-            const response = await axios.get('http://localhost:4056/bussiness/viewproduct', {
+            const response = await axios.get(`${baseUrl}bussiness/viewproduct`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data"
+                    "Content-Type": "application/json"
                 }
             });
 
-            // Filter products where bussinessId matches bussinessdetails._id
-            const filteredProducts = response.data.data.filter(
-                product => product.bussinessId === bussinessdetails._id
-            );
-            console.log(filteredProducts);
-
-            setProducts(filteredProducts);
+            if (response.data && response.data.data) {
+                const filteredProducts = response.data.data.filter(
+                    product => product && product.bussinessId === bussinessdetails._id
+                );
+                setProducts(filteredProducts || []);
+                setFilteredProducts(filteredProducts || []);
+            } else {
+                setProducts([]);
+                setFilteredProducts([]);
+            }
         } catch (error) {
-            console.log(error);
+            console.error("Error fetching products:", error);
             toast.error("Error fetching products");
+            setProducts([]);
+            setFilteredProducts([]);
         }
     };
 
@@ -61,19 +83,31 @@ const BussinessHome = () => {
 
     const [bussiness, setBussiness] = useState({});
     const fetchUser = async () => {
-        const token = localStorage.getItem('token');
-        const decoded = jwtDecode(token);
-        const bussiness = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        const bussinessdetails = localStorage.setItem("bussinessDetails",
-            JSON.stringify(bussiness.data.bussiness));
-        setBussiness(bussiness.data.bussiness);
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/bussiness/login');
+                return;
+            }
+            
+            const decoded = jwtDecode(token);
+            const response = await axios.get(`${baseUrl}bussiness/getbussiness/${decoded.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            
+            if (response.data && response.data.bussiness) {
+                localStorage.setItem("bussinessDetails", JSON.stringify(response.data.bussiness));
+                setBussiness(response.data.bussiness);
+                setBussinessdetails(response.data.bussiness);
+            }
+        } catch (error) {
+            console.error("Error fetching business details:", error);
+            toast.error("Error fetching business details");
+        }
     }
 
-    const navigate = useNavigate();
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -82,7 +116,7 @@ const BussinessHome = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('bussinessDetails');
         navigate('/bussiness/login');
-        toast.success("you logged out");
+        toast.success("You have been logged out");
     }
 
     // for profile 
@@ -113,7 +147,7 @@ const BussinessHome = () => {
     const handleDataChange = (e) => {
         setError((prevError) => ({
             ...prevError,
-            [name]: ""
+            [e.target.name]: ""
         }));
         const { name, value } = e.target;
         setData(prev => {
@@ -187,27 +221,29 @@ const BussinessHome = () => {
         formData.append('email', data.email);
         formData.append('address', data.address);
         formData.append('phone', data.phone);
-        formData.append('profilePic', data.profilePic);
+        if (data.profilePic) {
+            formData.append('profilePic', data.profilePic);
+        }
 
         const token = localStorage.getItem("token");
-        const updated = await axios.post(`${baseUrl}bussiness/editBussiness/${bussiness._id}`, formData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        setData({
-            name: "",
-            address: "",
-            email: "",
-            phone: ""
-        })
-        if (updated.data.message === "bussiness updated successfully.") {
-            toast.success("Bussiness updated successfully.")
-            setEditOpen(false);
-            fetchUser();
-        }
-        else {
-            toast.error("Error in updating Bussiness profile")
+        try {
+            const updated = await axios.post(`${baseUrl}bussiness/editBussiness/${bussiness._id}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            
+            if (updated.data && updated.data.message === "bussiness updated successfully.") {
+                toast.success("Business updated successfully.")
+                setEditOpen(false);
+                fetchUser();
+            }
+            else {
+                toast.error("Error in updating Business profile")
+            }
+        } catch (error) {
+            console.error("Error updating business:", error);
+            toast.error("Error updating business profile");
         }
     }
 
@@ -222,7 +258,7 @@ const BussinessHome = () => {
         });
 
         setImagePreview(bussiness?.profilePic
-            ? `http://localhost:4056/uploads/${bussiness?.profilePic}`
+            ? `${baseUrl}uploads/${bussiness?.profilePic}`
             : null);
         setEditOpen(true);
     }
@@ -238,26 +274,36 @@ const BussinessHome = () => {
             navigate("/bussiness/login");
             return;
         }
-    }, []);
+    }, [navigate]);
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
 
     return (
         <>
-            <BussinessNavbar bussinessdetails={bussiness} onAvatarClick={onAvatarClick} />
+            <BussinessNavbar 
+                bussinessdetails={bussiness} 
+                onAvatarClick={onAvatarClick} 
+                searchTerm={searchTerm}
+                onSearchChange={handleSearchChange}
+            />
 
             {showProfileCard && (
                 <ClickAwayListener onClickAway={() => setShowProfileCard(false)}>
                     <Box sx={{ position: 'absolute', top: "80px", right: '60px', zIndex: 5, width: "375px" }}>
                         <Card sx={{ Width: "375px", height: "490px", position: "relative", zIndex: -2 }}>
                             <Avatar sx={{ height: "146px", width: "146px", position: "absolute", top: "50px", left: "100px", zIndex: 2 }}
-                                src={`http://localhost:4056/uploads/${bussiness?.profilePic}`} alt={bussiness?.name}></Avatar>
+                                src={bussiness?.profilePic ? `${baseUrl}uploads/${bussiness?.profilePic}` : ""} 
+                                alt={bussiness?.name || "Business"}></Avatar>
                             <Box sx={{ height: '132px', background: '#9B70D3', width: "100%", position: "relative" }}>
                                 <Box component="img" src={arrow} sx={{ position: "absolute", top: '25px', left: "25px" }}></Box>
                             </Box>
                             <Box display={"flex"} flexDirection={"column"} alignItems={"center"} p={2} sx={{ gap: "15px", mt: "90px" }}>
-                                <Typography variant='h5' color='secondary' sx={{ fontSize: "24px", fontWeight: "400" }}>{bussiness.name}</Typography>
-                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><EmailOutlinedIcon />{bussiness.email}</Typography>
-                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocalPhoneOutlinedIcon />{bussiness.phone}</Typography>
-                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocationOnOutlinedIcon />{bussiness.address}</Typography>
+                                <Typography variant='h5' color='secondary' sx={{ fontSize: "24px", fontWeight: "400" }}>{bussiness.name || "Business"}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><EmailOutlinedIcon />{bussiness.email || "No email"}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocalPhoneOutlinedIcon />{bussiness.phone || "No phone"}</Typography>
+                                <Typography display={"flex"} justifyContent={"center"} alignItems={"center"} variant='p' color='primary' sx={{ fontSize: "15px", fontWeight: "400", gap: "30px" }}><LocationOnOutlinedIcon />{bussiness.address || "No address"}</Typography>
                                 <Box display={"flex"} gap={3} alignItems={"center"}>
                                     <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleEditOpen}>Edit</Button>
                                     <Button variant='contained' color='secondary' sx={{ borderRadius: "15px", marginTop: "20px", mb: "20px", height: "40px", width: '100px', padding: '10px 35px' }} onClick={handleOpen}>Logout</Button>
@@ -275,7 +321,6 @@ const BussinessHome = () => {
                         variant="contained"
                         color="secondary"
                         sx={{ borderRadius: "25px" }}
-                        onClick={() => navigate('/bussiness/addproduct')}
                     >
                         Add Product
                     </Button>
@@ -283,165 +328,179 @@ const BussinessHome = () => {
             </Box>
 
             <Box sx={{
-                height: "100%",
                 border: "1px solid black",
                 borderRadius: "15px",
                 margin: "20px 75px",
                 padding: "20px"
             }}>
-                <Grid
-                    container
-                    spacing={3}
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                >
-                    {products.map((item, index) => (
-                        <Grid
-                            item
-                            xs={12}
-                            sm={6}
-                            md={4}
-                            key={index}
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    width: '100%',
-                                    maxWidth: '500px',
-                                    height: "291px",
-                                    border: "1px solid black",
-                                    borderRadius: "10px",
-                                    padding: "20px",
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Box
+                {filteredProducts.length === 0 ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+                        <Typography variant="h6">
+                            {searchTerm ? "No products match your search." : "No products found. Add your first product!"}
+                        </Typography>
+                    </Box>
+                ) : (
+                    <Grid
+                        container
+                        spacing={3}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        {filteredProducts.map((item) => (
+                            item && (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
+                                    key={item._id}
                                     sx={{
                                         display: 'flex',
-                                        alignItems: 'center',
                                         justifyContent: 'center',
-                                        width: '100%',
-                                        gap: '20px'
+                                        alignItems: 'center'
                                     }}
                                 >
                                     <Box
-                                        component="img"
-                                        src={`http://localhost:4056/uploads/${item.photo?.filename}`}
                                         sx={{
-                                            width: "100px",
-                                            height: "100px",
-                                            objectFit: 'cover',
-                                            borderRadius: '8px'
-                                        }}
-                                    />
-                                    <Box
-                                        sx={{
+                                            width: '100%',
+                                            maxWidth: '500px',
+                                            height: "auto",
+                                            minHeight: "291px",
+                                            border: "1px solid black",
+                                            borderRadius: "10px",
+                                            padding: "20px",
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            gap: '10px',
-                                            width: '100%'
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
                                         }}
                                     >
                                         <Box
                                             sx={{
                                                 display: 'flex',
-                                                justifyContent: 'space-between',
                                                 alignItems: 'center',
-                                                width: '100%'
+                                                justifyContent: 'center',
+                                                width: '100%',
+                                                gap: '20px',
+                                                flexDirection: { xs: 'column', sm: 'row' }
                                             }}
                                         >
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Product:</Typography>
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.productName}</Typography>
+                                            {item.photo && item.photo.filename && (
+                                                <Box
+                                                    component="img"
+                                                    src={`${baseUrl}uploads/${item.photo.filename}`}
+                                                    sx={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: 'cover',
+                                                        borderRadius: '8px'
+                                                    }}
+                                                    alt={item.productName || "Product"}
+                                                />
+                                            )}
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: '10px',
+                                                    width: '100%'
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        width: '100%'
+                                                    }}
+                                                >
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Product:</Typography>
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.productName || "N/A"}</Typography>
+                                                </Box>
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        width: '100%'
+                                                    }}
+                                                >
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Stock:</Typography>
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.stockavailable || "0"}</Typography>
+                                                </Box>
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        width: '100%'
+                                                    }}
+                                                >
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Special Offer:</Typography>
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.specialOffer ? "Yes" : "No"}</Typography>
+                                                </Box>
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        width: '100%'
+                                                    }}
+                                                >
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Discount:</Typography>
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.discountPrice || "0"}%</Typography>
+                                                </Box>
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        width: '100%'
+                                                    }}
+                                                >
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Price:</Typography>
+                                                    <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>₹{item.price || "0"}</Typography>
+                                                </Box>
+                                            </Box>
                                         </Box>
                                         <Box
                                             sx={{
                                                 display: 'flex',
-                                                justifyContent: 'space-between',
+                                                justifyContent: 'center',
                                                 alignItems: 'center',
-                                                width: '100%'
+                                                gap: '20px',
+                                                width: '100%',
+                                                marginTop: '20px'
                                             }}
                                         >
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Stock:</Typography>
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.stockavailable}</Typography>
-                                        </Box>
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                width: '100%'
-                                            }}
-                                        >
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Special Offer:</Typography>
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.specialOffer ? "Yes" : "No"}</Typography>
-                                        </Box>
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                width: '100%'
-                                            }}
-                                        >
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Discount:</Typography>
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>{item.discountPrice}%</Typography>
-                                        </Box>
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                width: '100%'
-                                            }}
-                                        >
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "500", color: "black" }}>Price:</Typography>
-                                            <Typography variant='p' sx={{ fontSize: "16px", fontWeight: "400", color: "black" }}>₹{item.price}</Typography>
+                                            <Link to={`/bussiness/ViewProduct/${item._id}`} style={{ textDecoration: 'none' }}>
+                                                <Button
+                                                    variant="contained"
+                                                    color='secondary'
+                                                    sx={{ borderRadius: "25px", width: '100px' }}
+                                                >
+                                                    View
+                                                </Button>
+                                            </Link>
+                                            <Link to={`/bussiness/editproduct/${item._id}`} style={{ textDecoration: 'none' }}>
+                                                <Button
+                                                    variant="contained"
+                                                    color='secondary'
+                                                    sx={{ borderRadius: "25px", width: '100px' }}
+                                                >
+                                                    Edit
+                                                </Button>
+                                            </Link>
                                         </Box>
                                     </Box>
-                                </Box>
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        gap: '20px',
-                                        width: '100%',
-                                        marginTop: '20px'
-                                    }}
-                                >
-                                    <Link to={`/bussiness/ViewProduct/${item._id}`} style={{ textDecoration: 'none' }}>
-                                        <Button
-                                            variant="contained"
-                                            color='secondary'
-                                            sx={{ borderRadius: "25px", width: '100px' }}
-                                        >
-                                            View
-                                        </Button>
-                                    </Link>
-                                    <Link to={`/bussiness/editproduct/${item._id}`} style={{ textDecoration: 'none' }}>
-                                        <Button
-                                            variant="contained"
-                                            color='secondary'
-                                            sx={{ borderRadius: "25px", width: '100px' }}
-                                        >
-                                            Edit
-                                        </Button>
-                                    </Link>
-                                </Box>
-                            </Box>
-                        </Grid>
-                    ))}
-                </Grid>
+                                </Grid>
+                            )
+                        ))}
+                    </Grid>
+                )}
             </Box>
             <Footer />
 
@@ -577,4 +636,4 @@ const BussinessHome = () => {
     )
 }
 
-export default BussinessHome
+export default BussinessHome;

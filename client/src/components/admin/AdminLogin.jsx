@@ -13,8 +13,8 @@ const AdminLogin = () => {
     const siginupStyle = { background: "white", boxShadow: "none" };
 
     const [data, setData] = useState({
-        userId: "Admin123",
-        password: "admin@123"
+        userId: "",
+        password: ""
     });
     const navigate = useNavigate();
     const handleInputChange = (e) => {

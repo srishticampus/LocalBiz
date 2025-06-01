@@ -37,6 +37,12 @@ const CustomerSchema=mongoose.Schema(
             type:Boolean,
             require:true
         },
+        isVerified: {
+            type: Boolean,
+            default: false
+        },
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
         isActive:{
             type:Boolean,
             default:true

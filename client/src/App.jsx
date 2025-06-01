@@ -41,6 +41,8 @@ import BusinessViewProduct from './components/bussiness/BusinessViewProduct';
 import OrganizerBussinessRequest from './components/organiser/OrganiserBussinessRequests';
 import OrganiserAboutUs from './components/organiser/OrganiserAboutUs';
 import OrganiserContact from './components/organiser/OrganiserContact';
+import CustomerBusinessView from './components/customer/CustomerBussinessView';
+import OrganiserAddEvents from './components/organiser/OrganiserAddEvents';
 
 
 function App() {
@@ -90,6 +92,7 @@ function App() {
           <Route path='/customer/Viewcompaints' element={<CustomerComplaints />} />
           <Route path='/customer/AboutUs' element={<CustomerAboutUs />} />
           <Route path='/customer/Contact' element={<CustomerContact />} />
+          <Route path='/customer/bussinessview/:id' element={<CustomerBusinessView/>}/>
 
 
 
@@ -112,6 +115,8 @@ function App() {
           <Route path='/organiser/bussinessrequest' element={<OrganizerBussinessRequest/>}/>
           <Route path='/organiser/AboutUs' element={<OrganiserAboutUs />} />
           <Route path='/organiser/Contact' element={<OrganiserContact />} />
+          <Route path='/organiser/addevents' element={<OrganiserAddEvents />} />
+          
 
         </Routes>
       </ThemeProvider>

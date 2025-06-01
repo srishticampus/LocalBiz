@@ -2,6 +2,8 @@ const organisationModel=require("../Models/organiserModel");
 const bcrypt=require("bcryptjs");
 const multer=require("multer");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const sendEmail = require("../Utils/emailService");
 
 const storage=multer.diskStorage({
     destination:(req,file,cb)=>{
@@ -84,45 +86,82 @@ const organisationLogin=async (req,res)=>{
     }
 }
 
-const organisationForgotPassword= async(req,res)=>{
+const organisationForgotPassword = async (req, res) => {
     try {
-        const {email}=req.body;
-        const organisation= await organisationModel.findOne({email});
-        if(!organisation){
-            return res.json({message:" No organisation found with this email."})
-        }
-        res.json({
-            message:"navigate to password reset page",
-        })
+        const { email } = req.body;
+        const organisation = await organisationModel.findOne({ email });
 
-        
+        if (!organisation) {
+            return res.status(404).json({ message: "No organisation found with this email." });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString("hex");
+        organisation.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+        organisation.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+        await organisation.save();
+
+        // Create reset URL
+        const resetURL = `${req.protocol}://${req.get("host")}/organisation/resetpassword/${resetToken}`;
+
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetURL} \n\n with your new password. If you did not request this, please ignore this email and your password will remain unchanged.`;
+
+        try {
+            await sendEmail({
+                email: organisation.email,
+                subject: "Password Reset Token",
+                message,
+            });
+
+            res.status(200).json({
+                message: "Token sent to email!",
+            });
+        } catch (error) {
+            organisation.resetPasswordToken = undefined;
+            organisation.resetPasswordExpires = undefined;
+            await organisation.save();
+            return res.status(500).json({ message: "Error sending email. Please try again later." });
+        }
+
     } catch (error) {
         console.log(error.message);
-        res.status(500).json({message:error.message});
+        res.status(500).json({ message: error.message });
     }
 };
-const organisationResetPassword= async(req,res)=>{
+
+const organisationResetPassword = async (req, res) => {
     try {
-        const {password,confirmpassword}=req.body;
-        // const {email}=req.params;
-        const organisation= await organisationModel.findOne({email:req.params.email});
-        if(!organisation){
-            return res.json({message:"No organisation found with this email."})
-        };
-        if(password!==confirmpassword){
-            return res.json({message:"Passwords do not match."})
+        const resetPasswordToken = crypto.createHash("sha256").update(req.params.email).digest("hex"); // req.params.email is actually the token here
+        const organisation = await organisationModel.findOne({
+            resetPasswordToken,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+        if (!organisation) {
+            return res.status(400).json({ message: "Password reset token is invalid or has expired." });
         }
-        const hashedPassword=await bcrypt.hash(password,10);
-        organisation.password=hashedPassword;
-        organisation.confirmpassword=hashedPassword;
-        await organisation.save(); 
-        res.json({message:"Password reset successfully."});
+
+        const { password, confirmpassword } = req.body;
+
+        if (password !== confirmpassword) {
+            return res.status(400).json({ message: "Passwords do not match." });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        organisation.password = hashedPassword;
+        organisation.confirmpassword = hashedPassword;
+        organisation.resetPasswordToken = undefined;
+        organisation.resetPasswordExpires = undefined;
+
+        await organisation.save();
+        res.status(200).json({ message: "Password reset successfully." });
 
     } catch (error) {
         console.log(error.message);
-        res.status(500).json({message:error.message});
+        res.status(500).json({ message: error.message });
     }
-}
+};
 const getOrganisationById=async(req,res)=>{
     try {
         const organisationId=req.params.id;

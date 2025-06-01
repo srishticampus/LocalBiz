@@ -113,5 +113,34 @@ const editBussinessProducts= async(req,res)=>{
     }
 
 }
+const viewSingleProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await bussinessProductModel.findById(productId);
+        
+        if (!product) {
+            return res.status(404).json({
+                message: "Product not found"
+            });
+        }
 
-module.exports={uploadProductPic,addbussinessProduct,editBussinessProducts,viewBussinessProduct}
+        // Verify the product belongs to the requesting business
+        if (product.bussinessId.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "Unauthorized to view this product"
+            });
+        }
+
+        return res.json({
+            message: "Product retrieved successfully",
+            data: product
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+module.exports={uploadProductPic,addbussinessProduct,editBussinessProducts,viewBussinessProduct,viewSingleProduct}
